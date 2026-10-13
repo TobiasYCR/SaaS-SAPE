@@ -1,9 +1,12 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+import { currentUser, supabase } from './auth'
 
 const route = useRoute()
+const router = useRouter()
 const isMenuOpen = ref(false)
+const signOutError = ref('')
 
 const pageTitle = computed(() => {
   const titles = {
@@ -11,9 +14,17 @@ const pageTitle = computed(() => {
     '/offers': 'Ofertas de pasantía',
     '/applications': 'Postulaciones',
     '/followups': 'Seguimientos',
+    '/change-password': 'Cambiar contraseña',
   }
   return titles[route.path] || 'SAPE'
 })
+
+const userName = computed(() => currentUser.value?.user_metadata?.full_name || currentUser.value?.email || 'Usuario')
+const userInitials = computed(() => userName.value
+  .split(/\s+/)
+  .slice(0, 2)
+  .map((part) => part.charAt(0).toUpperCase())
+  .join(''))
 
 const navigation = [
   { label: 'Resumen general', to: '/dashboard', icon: '⌂' },
@@ -21,10 +32,30 @@ const navigation = [
   { label: 'Postulaciones', to: '/applications', icon: '✓' },
   { label: 'Seguimientos', to: '/followups', icon: '◷' },
 ]
+
+async function signOut() {
+  signOutError.value = ''
+  if (!supabase) {
+    signOutError.value = 'La autenticación no está configurada.'
+    return
+  }
+
+  try {
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      signOutError.value = error.message
+      return
+    }
+    await router.replace('/login')
+  } catch (error) {
+    signOutError.value = error.message || 'No se pudo cerrar la sesión.'
+  }
+}
 </script>
 
 <template>
-  <div class="app-shell">
+  <RouterView v-if="route.meta.publicAuth" />
+  <div v-else class="app-shell">
     <aside class="sidebar" :class="{ 'sidebar--open': isMenuOpen }">
       <div class="brand">
         <div class="brand-mark">S</div>
@@ -49,7 +80,12 @@ const navigation = [
 
       <div class="sidebar-bottom">
         <div class="help-card"><span class="help-icon">?</span><div><strong>¿Necesitas ayuda?</strong><span>Visita nuestro centro de soporte</span></div></div>
-        <div class="user-row"><div class="avatar">AC</div><div><strong>Andrea Cubas</strong><span>Coordinadora</span></div><span class="dots">•••</span></div>
+        <div class="user-row"><div class="avatar">{{ userInitials }}</div><div class="user-details"><strong>{{ userName }}</strong><span>{{ currentUser?.email }}</span></div></div>
+        <p v-if="signOutError" class="sidebar-error" role="alert">{{ signOutError }}</p>
+        <div class="account-actions">
+          <RouterLink to="/change-password">Cambiar contraseña</RouterLink>
+          <button type="button" @click="signOut">Cerrar sesión</button>
+        </div>
       </div>
     </aside>
 
