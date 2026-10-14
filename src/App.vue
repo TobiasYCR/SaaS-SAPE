@@ -67,11 +67,11 @@ async function signOut() {
 
       <div class="workspace-switcher">
         <div class="avatar avatar--small">SC</div>
-        <div><strong>Santa Catalina</strong><span>Institución educativa</span></div>
+        <div><strong>Tecnica 67</strong><span>Institución educativa</span></div>
         <span class="chevron">⌄</span>
       </div>
 
-      <p class="nav-label">GESTIÓN</p>
+      <p class="nav-label">VIDA ESCOLAR</p>
       <nav class="main-nav" aria-label="Navegación principal">
         <RouterLink v-for="item in navigation" :key="item.to" :to="item.to" @click="isMenuOpen = false">
           <span class="nav-icon">{{ item.icon }}</span>{{ item.label }}
