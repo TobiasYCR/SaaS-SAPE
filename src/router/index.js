@@ -5,6 +5,7 @@ import ApplicationsView from '../views/ApplicationsView.vue'
 import FollowupsView from '../views/FollowupsView.vue'
 import AuthView from '../views/AuthView.vue'
 import ChangePasswordView from '../views/ChangePasswordView.vue'
+import EmpresasView from '../views/EmpresasView.vue'
 import { currentUser, initializeAuth } from '../auth'
 
 const router = createRouter({
@@ -17,6 +18,7 @@ const router = createRouter({
     { path: '/applications', component: ApplicationsView, meta: { requiresAuth: true } },
     { path: '/followups', component: FollowupsView, meta: { requiresAuth: true } },
     { path: '/change-password', component: ChangePasswordView, meta: { requiresAuth: true } },
+    { path: '/empresas', component: EmpresasView, meta: { requiresAuth: true } },
   ],
 })
 

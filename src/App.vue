@@ -15,6 +15,7 @@ const pageTitle = computed(() => {
     '/applications': 'Postulaciones',
     '/followups': 'Seguimientos',
     '/change-password': 'Cambiar contraseña',
+    '/empresas': 'Empresas',
   }
   return titles[route.path] || 'SAPE'
 })
@@ -31,6 +32,7 @@ const navigation = [
   { label: 'Ofertas', to: '/offers', icon: '▤' },
   { label: 'Postulaciones', to: '/applications', icon: '✓' },
   { label: 'Seguimientos', to: '/followups', icon: '◷' },
+  { label: 'Empresas', to: '/empresas', icon: '▦' },
 ]
 
 async function signOut() {
