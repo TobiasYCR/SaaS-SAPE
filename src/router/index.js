@@ -6,7 +6,7 @@ import FollowupsView from '../views/FollowupsView.vue'
 import AuthView from '../views/AuthView.vue'
 import ChangePasswordView from '../views/ChangePasswordView.vue'
 import EmpresasView from '../views/EmpresasView.vue'
-import { currentUser, initializeAuth } from '../auth'
+import { currentUser, initializeAuth } from '../composables/useAuth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

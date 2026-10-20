@@ -1,7 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { authError, supabase } from '../auth'
+import { authError } from '../composables/useAuth'
+import { supabase } from '../services/supabase'
 
 const route = useRoute()
 const router = useRouter()

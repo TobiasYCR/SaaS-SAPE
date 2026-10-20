@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { supabase } from '../auth'
+import { supabase } from '../services/supabase'
 
 const password = ref('')
 const confirmPassword = ref('')
