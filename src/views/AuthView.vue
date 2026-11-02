@@ -1,4 +1,5 @@
 <script setup>
+import { traducirError } from '../utils/errores'
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { authError } from '../composables/useAuth'
@@ -73,7 +74,7 @@ async function submitAuth() {
     authError.value = ''
     await router.replace(safeRedirectPath())
   } catch (error) {
-    errorMessage.value = error.message || 'No se pudo completar la solicitud.'
+    errorMessage.value = traducirError(error)
   } finally {
     isSubmitting.value = false
   }

@@ -1,9 +1,12 @@
 import { db, ejecutar } from './supabase'
+import { textoBusqueda } from '../utils/validaciones'
 
 // Directorio: visible para todos los usuarios autenticados
-export function listarEmpresas({ busqueda = '', rubro = '' } = {}) {
+export function listarEmpresas({ busqueda = '', provincia = '', rubro = '' } = {}) {
   let consulta = db().from('empresas').select('*').eq('activa', true).order('razon_social')
-  if (busqueda) consulta = consulta.or(`razon_social.ilike.%${busqueda}%,nombre_fantasia.ilike.%${busqueda}%,localidad.ilike.%${busqueda}%`)
+  const texto = textoBusqueda(busqueda)
+  if (texto) consulta = consulta.or(`razon_social.ilike.%${texto}%,nombre_fantasia.ilike.%${texto}%,localidad.ilike.%${texto}%,rubro.ilike.%${texto}%`)
+  if (provincia) consulta = consulta.eq('provincia', provincia)
   if (rubro) consulta = consulta.eq('rubro', rubro)
   return ejecutar(consulta)
 }
@@ -13,6 +16,8 @@ export function obtenerEmpresa(id) {
 }
 
 // Solo el empresa_admin de esa empresa (RLS)
-export function actualizarEmpresa(id, cambios) {
-  return ejecutar(db().from('empresas').update(cambios).eq('id', id).select().single())
+export function actualizarEmpresa(id, { razon_social, nombre_fantasia, cuit, rubro, descripcion, direccion, localidad, provincia, email, telefono, sitio_web }) {
+  return ejecutar(db().from('empresas')
+    .update({ razon_social, nombre_fantasia, cuit, rubro, descripcion, direccion, localidad, provincia, email, telefono, sitio_web })
+    .eq('id', id).select().single())
 }

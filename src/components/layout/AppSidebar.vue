@@ -1,8 +1,9 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { currentUser, organizacion } from '../../composables/useAuth'
+import { currentUser, ETIQUETA_ROL, organizacion, perfil, rol } from '../../composables/useAuth'
 import { supabase } from '../../services/supabase'
+import DatosPruebaBadge from '../common/DatosPruebaBadge.vue'
 
 defineProps({ open: { type: Boolean, default: false } })
 const emit = defineEmits(['navigate'])
@@ -10,19 +11,27 @@ const emit = defineEmits(['navigate'])
 const router = useRouter()
 const signOutError = ref('')
 
-const navigation = [
+// tipo: limita el ítem a un tipo de organización
+const ITEMS = [
   { label: 'Resumen general', to: '/dashboard', icon: '⌂' },
-  { label: 'Ofertas', to: '/offers', icon: '▤' },
-  { label: 'Postulaciones', to: '/applications', icon: '✓' },
-  { label: 'Seguimientos', to: '/followups', icon: '◷' },
+  { label: 'Escuelas', to: '/escuelas', icon: '▦' },
   { label: 'Empresas', to: '/empresas', icon: '▦' },
+  { label: 'Alumnos', to: '/alumnos', icon: '♙', tipo: 'escuela' },
+  { label: 'Convenios', to: '/convenios', icon: '▤' },
+  { label: 'Inscripciones', to: '/inscripciones', icon: '✓' },
+  { label: 'Seguimientos', to: '/seguimientos', icon: '◷' },
+  { label: 'Mi organización', to: '/organizacion', icon: '⚙' },
 ]
 
-const userName = computed(() => currentUser.value?.user_metadata?.full_name || currentUser.value?.email || 'Usuario')
+const navigation = computed(() => {
+  if (!organizacion.value) return [{ label: 'Registrar organización', to: '/registro-organizacion', icon: '+' }]
+  return ITEMS.filter((item) => !item.tipo || item.tipo === organizacion.value.tipo)
+})
+
+const userName = computed(() => perfil.value?.nombre_completo || currentUser.value?.user_metadata?.full_name || currentUser.value?.email || 'Usuario')
 const initials = (texto) => texto.split(/\s+/).slice(0, 2).map((parte) => parte.charAt(0).toUpperCase()).join('')
-const userInitials = computed(() => initials(userName.value))
 const orgNombre = computed(() => organizacion.value?.nombre || 'Sin organización')
-const orgTipo = computed(() => ({ escuela: 'Institución educativa', empresa: 'Empresa' })[organizacion.value?.tipo] || 'Completá el registro')
+const orgTipo = computed(() => ETIQUETA_ROL[rol.value] || 'Completá el registro')
 
 async function signOut() {
   signOutError.value = ''
@@ -55,23 +64,25 @@ async function signOut() {
 
     <div class="workspace-switcher">
       <div class="avatar avatar--small">{{ initials(orgNombre) }}</div>
-      <div><strong>{{ orgNombre }}</strong><span>{{ orgTipo }}</span></div>
-      <span class="chevron">⌄</span>
+      <div>
+        <strong>{{ orgNombre }}</strong>
+        <span>{{ orgTipo }}</span>
+        <DatosPruebaBadge v-if="organizacion?.datosPrueba" />
+      </div>
     </div>
 
-    <p class="nav-label">VIDA ESCOLAR</p>
+    <p class="nav-label">{{ organizacion?.tipo === 'empresa' ? 'EMPRESA' : 'VIDA ESCOLAR' }}</p>
     <nav class="main-nav" aria-label="Navegación principal">
       <RouterLink v-for="item in navigation" :key="item.to" :to="item.to" @click="emit('navigate')">
-        <span class="nav-icon">{{ item.icon }}</span>{{ item.label }}
+        <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>{{ item.label }}
       </RouterLink>
     </nav>
 
     <div class="sidebar-bottom">
-      <div class="help-card"><span class="help-icon">?</span><div><strong>¿Necesitas ayuda?</strong><span>Visita nuestro centro de soporte</span></div></div>
-      <div class="user-row"><div class="avatar">{{ userInitials }}</div><div class="user-details"><strong>{{ userName }}</strong><span>{{ currentUser?.email }}</span></div></div>
+      <div class="user-row"><div class="avatar">{{ initials(userName) }}</div><div class="user-details"><strong>{{ userName }}</strong><span>{{ currentUser?.email }}</span></div></div>
       <p v-if="signOutError" class="sidebar-error" role="alert">{{ signOutError }}</p>
       <div class="account-actions">
-        <RouterLink to="/change-password">Cambiar contraseña</RouterLink>
+        <RouterLink to="/change-password" @click="emit('navigate')">Cambiar contraseña</RouterLink>
         <button type="button" @click="signOut">Cerrar sesión</button>
       </div>
     </div>

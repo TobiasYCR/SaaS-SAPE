@@ -1,4 +1,5 @@
 <script setup>
+import { traducirError } from '../utils/errores'
 import { ref } from 'vue'
 import { supabase } from '../services/supabase'
 
@@ -30,7 +31,7 @@ async function updatePassword() {
     confirmPassword.value = ''
     notice.value = 'Tu contraseña se actualizó correctamente.'
   } catch (error) {
-    errorMessage.value = error.message || 'No se pudo actualizar la contraseña.'
+    errorMessage.value = traducirError(error)
   } finally {
     isSubmitting.value = false
   }

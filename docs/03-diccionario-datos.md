@@ -32,6 +32,7 @@ Institución educativa que usa la plataforma.
 | logo_url | text | | URL pública del logo (bucket `logos`) |
 | logo_ruta | text | | Ruta del logo en Storage |
 | activa | boolean | NN, default `true` | Visible y operativa |
+| datos_prueba | boolean | NN, default `false` | Registro ficticio de `seed.sql`; la app lo muestra con la etiqueta DATOS DE PRUEBA |
 | creado_en | timestamptz | NN, default `now()` | Fecha de alta |
 | actualizado_en | timestamptz | NN, trigger | Última modificación |
 
@@ -56,6 +57,7 @@ Organización que recibe pasantes.
 | logo_url | text | | URL pública del logo |
 | logo_ruta | text | | Ruta del logo en Storage |
 | activa | boolean | NN, default `true` | Visible y operativa |
+| datos_prueba | boolean | NN, default `false` | Registro ficticio de `seed.sql`; la app lo muestra con la etiqueta DATOS DE PRUEBA |
 | creado_en | timestamptz | NN | Fecha de alta |
 | actualizado_en | timestamptz | NN, trigger | Última modificación |
 

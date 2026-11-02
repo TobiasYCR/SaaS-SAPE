@@ -45,8 +45,9 @@ SAPE intermedia entre **escuelas** y **empresas** para gestionar pasantías esco
 |---|---|---|
 | Directorio de escuelas y empresas | Ve todo | Ve todo |
 | Convenios | Los suyos | Los suyos |
-| Alumnos | Los suyos | Solo los inscriptos en sus convenios |
-| Requisitos, inscripciones, datos, seguimientos | Los de sus convenios | Los de sus convenios |
+| Alumnos | Los suyos | Solo los que tienen una inscripción enviada en sus convenios |
+| Requisitos | Los de sus convenios | Los de sus convenios |
+| Inscripciones, datos, seguimientos | Las de sus convenios | Las de sus convenios, salvo los borradores |
 
 ## Usuarios y roles
 

@@ -58,7 +58,8 @@ select pg_temp.probar('Río Claro ve el directorio de 3 empresas',        '1', '
 select pg_temp.probar('Río Claro ve solo sus 2 convenios',               '1', '2', 'select count(*) from convenios');
 select pg_temp.probar('Los Aromos no ve alumnos de Río Claro',           '2', '0', $q$select count(*) from alumnos where escuela_id = '10000000-0000-4000-8000-000000000001'$q$);
 select pg_temp.probar('Pixel ve el directorio de 2 escuelas',            '3', '2', 'select count(*) from escuelas');
-select pg_temp.probar('Pixel ve solo los 3 alumnos inscriptos con ella', '3', '3', 'select count(*) from alumnos');
+select pg_temp.probar('Pixel ve solo los 2 alumnos con inscripción enviada', '3', '2', 'select count(*) from alumnos');
+select pg_temp.probar('Pixel no ve la inscripción en borrador', '3', '0', $q$select count(*) from inscripciones where estado = 'borrador'$q$);
 select pg_temp.probar('Escuela no puede iniciar un convenio',            '1', 'error',
   $q$insert into convenios (empresa_id, escuela_id, ciclo_lectivo, cupos) values ('20000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000001', 2027, 1)$q$);
 select pg_temp.probar('Empresa se postula a una escuela',                '3', 'ok',
