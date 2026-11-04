@@ -2,6 +2,8 @@
 -- SAPE · Datos ficticios de prueba
 -- Ejecutar en el SQL Editor después de schema.sql.
 -- Todos los nombres, CUE, CUIT y DNI son inventados.
+-- Las organizaciones se marcan con datos_prueba = true: la app muestra la
+-- etiqueta "Datos de prueba" en ellas y en todo lo que les pertenece.
 --
 -- IDs fijos para poder seguir las relaciones a mano:
 --   escuelas       1000…0001  Escuela Técnica Río Claro
@@ -15,24 +17,24 @@
 --   inscripciones  6000…000x
 -- =====================================================================
 
-insert into public.escuelas (id, nombre, cue, modalidad, especialidades, descripcion, direccion, localidad, provincia, email, telefono) values
+insert into public.escuelas (id, nombre, cue, modalidad, especialidades, descripcion, direccion, localidad, provincia, email, telefono, datos_prueba) values
   ('10000000-0000-4000-8000-000000000001', 'Escuela Técnica Río Claro', '060000101', 'Técnica',
    '{"Programación","Electrónica"}', 'Escuela técnica de gestión pública con orientación en informática.',
-   'Av. Siempre Viva 1200', 'Lanús', 'Buenos Aires', 'contacto@rioclaro.edu.test', '11 4000-0001'),
+   'Av. Siempre Viva 1200', 'Lanús', 'Buenos Aires', 'contacto@rioclaro.edu.test', '11 4000-0001', true),
   ('10000000-0000-4000-8000-000000000002', 'Instituto Secundario Los Aromos', '140000202', 'Orientada',
    '{"Economía y Administración","Comunicación"}', 'Secundaria orientada de gestión privada.',
-   'Calle Falsa 456', 'Córdoba', 'Córdoba', 'secretaria@losaromos.edu.test', '351 400-0002');
+   'Calle Falsa 456', 'Córdoba', 'Córdoba', 'secretaria@losaromos.edu.test', '351 400-0002', true);
 
-insert into public.empresas (id, razon_social, nombre_fantasia, cuit, rubro, descripcion, direccion, localidad, provincia, email, telefono, sitio_web) values
+insert into public.empresas (id, razon_social, nombre_fantasia, cuit, rubro, descripcion, direccion, localidad, provincia, email, telefono, sitio_web, datos_prueba) values
   ('20000000-0000-4000-8000-000000000001', 'Pixel Andino S.R.L.', 'Pixel Andino', '30700000011', 'Software',
    'Estudio de desarrollo web y diseño UX.', 'Av. Corrientes 1000', 'CABA', 'Buenos Aires',
-   'rrhh@pixelandino.test', '11 5000-0001', 'https://pixelandino.test'),
+   'rrhh@pixelandino.test', '11 5000-0001', 'https://pixelandino.test', true),
   ('20000000-0000-4000-8000-000000000002', 'Cooperativa Norte Ltda.', 'Coop. Norte', '30700000022', 'Servicios IT',
    'Cooperativa de soporte técnico y redes.', 'Bv. Oroño 300', 'Rosario', 'Santa Fe',
-   'pasantias@coopnorte.test', '341 500-0002', null),
+   'pasantias@coopnorte.test', '341 500-0002', null, true),
   ('20000000-0000-4000-8000-000000000003', 'Grupo Delta S.A.', 'Delta', '30700000033', 'Contabilidad',
    'Estudio contable y administrativo.', 'San Martín 50', 'Mendoza', 'Mendoza',
-   'info@grupodelta.test', '261 500-0003', null);
+   'info@grupodelta.test', '261 500-0003', null, true);
 
 insert into public.alumnos (id, escuela_id, nombre, apellido, dni, fecha_nacimiento, curso, division, especialidad, email, responsable_nombre, responsable_telefono) values
   -- Escuela Técnica Río Claro

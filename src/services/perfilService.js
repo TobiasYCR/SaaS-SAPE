@@ -1,6 +1,6 @@
 import { db, ejecutar } from './supabase'
 
-const SELECT_PERFIL = '*, escuela:escuelas(id, nombre), empresa:empresas(id, razon_social, nombre_fantasia)'
+const SELECT_PERFIL = '*, escuela:escuelas(id, nombre, datos_prueba), empresa:empresas(id, razon_social, nombre_fantasia, datos_prueba)'
 
 export function obtenerMiPerfil(userId) {
   return ejecutar(db().from('perfiles').select(SELECT_PERFIL).eq('id', userId).maybeSingle())
@@ -10,6 +10,7 @@ export function actualizarMiPerfil(userId, { nombre_completo, telefono }) {
   return ejecutar(db().from('perfiles').update({ nombre_completo, telefono }).eq('id', userId).select().single())
 }
 
+// Miembros de la organización del usuario (RLS limita a su escuela o empresa)
 export function listarMiembros() {
   return ejecutar(db().from('perfiles').select('id, nombre_completo, email, rol, activo').not('rol', 'is', null).order('nombre_completo'))
 }

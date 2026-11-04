@@ -47,6 +47,7 @@ create table public.escuelas (
   logo_url        text,
   logo_ruta       text,
   activa          boolean not null default true,
+  datos_prueba    boolean not null default false,
   creado_en       timestamptz not null default now(),
   actualizado_en  timestamptz not null default now()
 );
@@ -68,6 +69,7 @@ create table public.empresas (
   logo_url         text,
   logo_ruta        text,
   activa           boolean not null default true,
+  datos_prueba     boolean not null default false,
   creado_en        timestamptz not null default now(),
   actualizado_en   timestamptz not null default now()
 );
@@ -168,7 +170,8 @@ create table public.inscripciones (
   actualizado_en    timestamptz not null default now(),
   -- FKs compuestas: convenio y alumno deben ser de la misma escuela
   foreign key (convenio_id, escuela_id) references public.convenios(id, escuela_id) on delete cascade,
-  foreign key (alumno_id, escuela_id)   references public.alumnos(id, escuela_id)   on delete cascade,
+  -- Sin cascada: un alumno con inscripciones no se borra (se da de baja con activo = false)
+  foreign key (alumno_id, escuela_id)   references public.alumnos(id, escuela_id),
   check (fecha_fin is null or fecha_inicio is null or fecha_fin >= fecha_inicio),
   unique (convenio_id, alumno_id),
   unique (id, convenio_id)
@@ -240,11 +243,13 @@ language sql stable security definer set search_path = '' as $$
   )
 $$;
 
+-- La empresa ve una inscripción recién cuando la escuela la envía (no ve borradores)
 create function public.puede_ver_inscripcion(p_inscripcion uuid) returns boolean
 language sql stable security definer set search_path = '' as $$
   select exists (
     select 1 from public.inscripciones i
     where i.id = p_inscripcion and public.es_parte_convenio(i.convenio_id)
+      and (i.escuela_id = public.mi_escuela() or i.estado <> 'borrador')
   )
 $$;
 
@@ -583,7 +588,8 @@ create policy "escuela ve sus alumnos y empresa los inscriptos" on public.alumno
        escuela_id = (select public.mi_escuela())
     or exists (select 1 from public.inscripciones i
                join public.convenios c on c.id = i.convenio_id
-               where i.alumno_id = alumnos.id and c.empresa_id = (select public.mi_empresa()))
+               where i.alumno_id = alumnos.id and i.estado <> 'borrador'
+                 and c.empresa_id = (select public.mi_empresa()))
   );
 create policy "admin escuela crea alumnos" on public.alumnos
   for insert to authenticated
@@ -630,14 +636,20 @@ create policy "admins eliminan requisitos" on public.requisitos
 
 -- Inscripciones: las crea la escuela; la empresa acepta/rechaza (ver trigger)
 create policy "partes ven inscripciones" on public.inscripciones
-  for select to authenticated using ((select public.es_parte_convenio(convenio_id)));
+  for select to authenticated using (
+    (select public.es_parte_convenio(convenio_id))
+    and (escuela_id = (select public.mi_escuela()) or estado <> 'borrador')
+  );
 create policy "escuela inscribe alumnos" on public.inscripciones
   for insert to authenticated with check (
     (select public.mi_rol()) = 'escuela_admin' and escuela_id = (select public.mi_escuela()) and estado = 'borrador'
   );
 create policy "admins de las partes actualizan inscripciones" on public.inscripciones
   for update to authenticated
-  using ((select public.es_admin()) and (select public.es_parte_convenio(convenio_id)))
+  using (
+    (select public.es_admin()) and (select public.es_parte_convenio(convenio_id))
+    and (escuela_id = (select public.mi_escuela()) or estado <> 'borrador')
+  )
   with check ((select public.es_parte_convenio(convenio_id)));
 create policy "escuela elimina borradores" on public.inscripciones
   for delete to authenticated using (
@@ -646,7 +658,7 @@ create policy "escuela elimina borradores" on public.inscripciones
 
 -- Datos de inscripción: los carga la escuela mientras la inscripción es borrador
 create policy "partes ven datos de inscripcion" on public.datos_inscripcion
-  for select to authenticated using ((select public.es_parte_convenio(convenio_id)));
+  for select to authenticated using ((select public.puede_ver_inscripcion(inscripcion_id)));
 create policy "escuela carga datos" on public.datos_inscripcion
   for insert to authenticated with check (
     (select public.mi_rol()) = 'escuela_admin'

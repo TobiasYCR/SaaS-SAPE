@@ -1,0 +1,95 @@
+/* Componentes de la versión 1: formularios, avisos, estados, detalle y adaptación a celulares */
+
+/* Avisos de carga, confirmación y error */
+.aviso{display:block;font-size:13px;line-height:1.45;padding:11px 13px;border-radius:9px;margin:0 0 14px}
+.aviso--error{color:#a33f3f;background:#fff0f0;border:1px solid #f6d3d3}
+.aviso--exito{color:#23784f;background:#eaf8f0;border:1px solid #c8ecd8}
+.aviso--info{color:#2f557f;background:#eef5ff;border:1px solid #d6e5fa}
+.aviso--prueba{color:#7a5300;background:#fff7e3;border:1px solid #f3e0ae}
+.cargando{display:flex;align-items:center;gap:9px;color:#6b7b90;font-size:13px;padding:18px 0}
+.cargando:before{content:'';width:15px;height:15px;border-radius:50%;border:2px solid #cfdcf0;border-top-color:var(--blue);animation:girar .8s linear infinite}
+@keyframes girar{to{transform:rotate(360deg)}}
+.vacio{color:#7d8ba0;font-size:13px;padding:22px;text-align:center}
+
+/* Etiquetas */
+.badge-prueba{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;color:#8a5d00;background:#ffefc2;border-radius:20px;padding:3px 8px;vertical-align:middle;white-space:nowrap}
+.estado{display:inline-block;font-size:11px;font-weight:600;border-radius:20px;padding:4px 10px;white-space:nowrap}
+.estado--gris{color:#64748b;background:#eef1f5}
+.estado--azul{color:#1d5fc9;background:#e8f0ff}
+.estado--violeta{color:#6b4fd1;background:#efebff}
+.estado--verde{color:#23784f;background:#e3f6ec}
+.estado--naranja{color:#a35a10;background:#fff1df}
+.estado--rojo{color:#b04444;background:#ffecec}
+
+/* Formularios */
+.formulario{display:grid;gap:14px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.form-grid--3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.campo{display:grid;gap:6px;font-size:13px;font-weight:600;color:#4b5d75}
+.campo--ancho{grid-column:1/-1}
+.campo .obligatorio{color:#c24848;margin-left:2px}
+.campo input,.campo select,.campo textarea{width:100%;border:1px solid #d8e0ec;border-radius:8px;padding:11px 12px;font:14px 'DM Sans',sans-serif;color:var(--navy);background:#fff;outline:0;min-height:42px}
+.campo textarea{resize:vertical;min-height:84px}
+.campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1768e51f}
+.campo--invalido input,.campo--invalido select,.campo--invalido textarea{border-color:#d46a6a}
+.campo-error{font-size:12px;font-weight:500;color:#b84141}
+.campo-ayuda{font-size:12px;font-weight:400;color:#8695a9}
+.campo-check{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:#4b5d75}
+.campo-check input{width:18px;height:18px}
+.acciones{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.acciones--fin{justify-content:flex-end}
+button:disabled{opacity:.55;cursor:not-allowed}
+.boton-peligro{border:0;border-radius:8px;padding:11px 17px;font:600 12px 'DM Sans';cursor:pointer;color:#b04444;background:#ffecec}
+.boton-chico{padding:8px 11px;font-size:12px}
+.link-accion{border:0;background:none;color:var(--blue);font:600 13px 'DM Sans';cursor:pointer;padding:0;text-decoration:none}
+
+/* Paneles y listados */
+.seccion{margin-bottom:18px}
+.seccion-titulo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.seccion-titulo h3{font:800 17px Manrope,sans-serif;color:var(--navy);margin:0}
+.filtros{display:flex;gap:10px;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid var(--line);align-items:center}
+.filtros .search-field{max-width:none;flex:1 1 240px;min-height:42px}
+.filtros .search-field input{font-size:14px}
+.filtros select{border:1px solid var(--line);border-radius:8px;padding:0 12px;min-height:42px;color:#4b5d75;font:13px 'DM Sans';background:#fff}
+.tabla td{font-size:13px;color:#4f6078;vertical-align:middle}
+.tabla th{font-size:10px}
+.tabla td strong{color:var(--navy)}
+.tabla small{display:block;color:#8a98ab;font-size:12px;margin-top:3px}
+.contador{font-size:12px;color:#8a98ab;padding:12px 20px}
+.detalle{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px 22px;margin:0}
+.detalle dt{font-size:11px;font-weight:700;letter-spacing:.05em;color:#8a98ab;text-transform:uppercase}
+.detalle dd{margin:4px 0 0;font-size:14px;color:var(--navy);word-break:break-word}
+.tarjetas{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.tarjeta{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:8px;align-content:start}
+.tarjeta h4{margin:0;font:800 15px Manrope,sans-serif;color:var(--navy)}
+.tarjeta p{margin:0;font-size:13px;color:#5c6d85;line-height:1.45}
+.dos-columnas{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:start}
+.selector-tipo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.selector-tipo button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:18px;text-align:left;cursor:pointer;font:13px 'DM Sans';color:#5c6d85}
+.selector-tipo button strong{display:block;font:800 16px Manrope,sans-serif;color:var(--navy);margin-bottom:4px}
+.selector-tipo button[aria-pressed=true]{border-color:var(--blue);background:#f3f8ff}
+.lista-seguimientos{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.lista-seguimientos li{border:1px solid var(--line);border-radius:10px;padding:13px 14px;font-size:13px;color:#4f6078}
+.lista-seguimientos .cabecera{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px;color:var(--navy);font-weight:700}
+.sidebar-backdrop{display:none}
+.workspace-switcher .badge-prueba{margin-top:4px}
+
+/* Celulares y tablets */
+@media(max-width:900px){
+  .sidebar-backdrop{display:block;position:fixed;inset:0;background:#0f1d3340;z-index:4}
+  .dos-columnas{grid-template-columns:1fr}
+  .form-grid--3{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:560px){
+  .form-grid,.form-grid--3,.selector-tipo{grid-template-columns:1fr}
+  .page-content{padding:20px 14px}
+  .panel{padding:16px}
+  .table-panel{padding:0}
+  .filtros{padding:14px}
+  .filtros select{flex:1 1 100%}
+  .acciones>button,.acciones>a{flex:1 1 auto;text-align:center}
+  .primary-button,.secondary-button,.filter-button,.boton-peligro{min-height:44px;font-size:14px}
+  th,td{padding:12px 14px}
+}
+.product-action{font-size:12px;padding:8px 11px;min-height:34px}
+.stat-card{display:block}

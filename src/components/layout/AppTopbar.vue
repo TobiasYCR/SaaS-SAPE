@@ -12,10 +12,9 @@ const hoy = computed(() => {
 
 <template>
   <header class="topbar">
-    <button class="menu-button" aria-label="Abrir menú" @click="emit('toggle-menu')">☰</button>
+    <button class="menu-button" type="button" aria-label="Abrir menú" @click="emit('toggle-menu')">☰</button>
     <div><p class="eyebrow">SAPE / {{ title }}</p><h1>{{ title }}</h1></div>
     <div class="topbar-actions">
-      <button class="icon-button" aria-label="Notificaciones">♧<span class="notification-dot"></span></button>
       <div class="topbar-date">{{ hoy }}</div>
     </div>
   </header>
