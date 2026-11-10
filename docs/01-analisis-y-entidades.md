@@ -13,6 +13,35 @@ SAPE intermedia entre **escuelas** y **empresas** para gestionar pasantías esco
 7. La empresa acepta o rechaza cada inscripción (respetando los cupos).
 8. Durante la pasantía se registran **seguimientos**.
 
+## Problema, cliente ideal y MVP de esta etapa
+
+Las escuelas coordinan pasantías con empresas usando información dispersa y procesos manuales. Esto dificulta saber qué alumnos participan, qué documentación requiere cada empresa y en qué estado está cada inscripción.
+
+El cliente ideal es una escuela secundaria (en especial, técnica) que organiza pasantías con una o más empresas. En el recorrido elegido, la persona usuaria principal es quien administra la escuela; la contraparte es quien administra la empresa y revisa las postulaciones.
+
+El MVP de SAPE conecta ambas organizaciones y permite gestionar convenios, alumnos, inscripciones y seguimientos. Para esta etapa se desarrolla y verifica una función central: **crear y enviar la inscripción de un alumno a un convenio activo**. No se incluyen en este recorrido la creación de convenios ni la configuración de organizaciones, que son pasos previos del producto.
+
+## Historias de usuario del recorrido
+
+- Como administrador de una escuela, quiero elegir un alumno activo para un convenio vigente y crear su inscripción, para iniciar su pasantía.
+- Como administrador de una escuela, quiero completar y guardar los requisitos solicitados por la empresa, para conservar los datos antes de enviar.
+- Como administrador de una escuela, quiero saber qué datos obligatorios faltan o tienen un formato inválido, para corregirlos antes de enviar.
+- Como administrador de una empresa, quiero consultar las inscripciones enviadas a mis convenios y responderlas, para gestionar los cupos.
+- Como organización, quiero que las inscripciones y sus datos queden asociados a mi convenio y se apliquen las reglas de acceso de mi escuela o empresa, para mantener aislada la información.
+
+## Recorrido implementado: inscribir un alumno
+
+1. La persona ingresa en `/login`. Vue Router exige una sesión y un perfil vinculado a una organización; si todavía no tiene organización, la dirige al registro correspondiente.
+2. Desde `/dashboard`, el administrador de la escuela entra en **Convenios** y abre un convenio con estado `activo`.
+3. En `/convenios/:id`, el sistema consulta el convenio, sus requisitos, las inscripciones existentes y los alumnos activos de la escuela. Solo ofrece alumnos que todavía no están inscriptos en ese convenio.
+4. El administrador elige un alumno. SAPE crea una inscripción en estado `borrador` y abre `/inscripciones/:id`.
+5. En el detalle, completa los requisitos definidos para ese convenio. Los tipos admitidos son texto, número, fecha, sí/no y archivo; los archivos permitidos son PDF, JPG y PNG de hasta 10 MB.
+6. Puede guardar los datos y volver a consultarlos. Antes de guardar se validan formatos; al enviar se comprueba que todos los requisitos obligatorios tengan una respuesta guardada. La base vuelve a validar los requisitos y la transición de estado.
+7. Si falta información o falla una operación, se muestra un mensaje y el borrador se mantiene disponible para corregir. Cuando el envío es válido, el estado cambia a `enviada`.
+8. El administrador de la empresa consulta la inscripción desde **Inscripciones**, abre el detalle y puede aceptarla o rechazarla. La base controla que no se excedan los cupos.
+
+Las rutas del recorrido se organizan con Vue Router (`/login`, `/dashboard`, `/convenios/:id`, `/inscripciones` y `/inscripciones/:id`). Los servicios persisten en Supabase; RLS filtra las filas por organización y las claves foráneas compuestas impiden asociar un alumno y un convenio de escuelas distintas. Los datos de prueba están en `supabase/seed.sql`; `supabase/tests/flujo_completo.sql` comprueba el recorrido y `supabase/tests/pruebas_rls.sql` el aislamiento y los permisos.
+
 ## Entidades
 
 | Tabla | Representa | Datos que guarda |

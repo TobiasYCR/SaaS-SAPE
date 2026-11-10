@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import { hasPlaceholderCredentials, supabase } from '../services/supabase'
+import { supabase, supabaseConfigError } from '../services/supabase'
 import { obtenerMiPerfil } from '../services/perfilService'
 
 export const currentUser = ref(null)
@@ -64,9 +64,7 @@ export async function initializeAuth() {
   if (initialized) return
 
   if (!supabase) {
-    authError.value = hasPlaceholderCredentials
-      ? 'Reemplaza los valores de ejemplo del archivo .env por la URL y la clave publicable de tu proyecto Supabase, y reinicia el servidor.'
-      : 'Configura VITE_SUPABASE_URL y VITE_SUPABASE_PUBLISHABLE_KEY para habilitar la autenticación.'
+    authError.value = supabaseConfigError
     initialized = true
     return
   }

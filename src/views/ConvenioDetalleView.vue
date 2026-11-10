@@ -42,13 +42,23 @@ const configurable = computed(() => estado.value === 'aceptado' && esAdmin.value
 const ocupados = computed(() => inscripciones.value.filter((i) => ['aceptada', 'en_curso', 'finalizada'].includes(i.estado)).length)
 
 async function cargar() {
-  const resultado = await carga.ejecutar(() => Promise.all([obtenerConvenio(id), listarRequisitos(id), listarInscripciones({ convenioId: id })]))
+  const resultado = await carga.ejecutar(async () => {
+    const [convenioCargado, requisitosCargados, inscripcionesCargadas] = await Promise.all([
+      obtenerConvenio(id),
+      listarRequisitos(id),
+      listarInscripciones({ convenioId: id }),
+    ])
+    const disponibles = esEscuelaAdmin.value && convenioCargado.estado === 'activo'
+      ? await listarAlumnos({ activos: true })
+      : []
+    return { convenioCargado, requisitosCargados, inscripcionesCargadas, disponibles }
+  })
   if (!resultado) return
-  ;[convenio.value, requisitos.value, inscripciones.value] = resultado
-  if (esEscuelaAdmin.value && estado.value === 'activo') {
-    const inscriptos = new Set(inscripciones.value.map((i) => i.alumno_id))
-    alumnosDisponibles.value = (await listarAlumnos({ activos: true })).filter((a) => !inscriptos.has(a.id))
-  }
+  convenio.value = resultado.convenioCargado
+  requisitos.value = resultado.requisitosCargados
+  inscripciones.value = resultado.inscripcionesCargadas
+  const inscriptos = new Set(inscripciones.value.map((i) => i.alumno_id))
+  alumnosDisponibles.value = resultado.disponibles.filter((a) => !inscriptos.has(a.id))
 }
 
 const MENSAJES = {
@@ -231,6 +241,9 @@ onMounted(cargar)
         </select>
         <button class="primary-button" type="submit" :disabled="!alumnoElegido || accion.cargando.value">Inscribir</button>
       </form>
+      <p v-if="esEscuelaAdmin && estado === 'activo' && !carga.cargando.value && !carga.error.value && !alumnosDisponibles.length" class="aviso aviso--info">
+        No hay alumnos activos disponibles para este convenio. <RouterLink class="link-accion" to="/alumnos">Gestionar alumnos →</RouterLink>
+      </p>
       <p v-else-if="estado !== 'activo'" class="aviso aviso--info">Las inscripciones se habilitan cuando el convenio está activo.</p>
       <p v-if="!inscripciones.length" class="vacio">Todavía no hay alumnos inscriptos.</p>
       <div v-else class="table-wrap">
