@@ -12,6 +12,10 @@ export function listarAlumnos({ busqueda = '', curso = '', activos = true } = {}
   return ejecutar(consulta)
 }
 
+export function obtenerAlumno(id) {
+  return ejecutar(db().from('alumnos').select('*').eq('id', id).single())
+}
+
 export function crearAlumno(alumno) {
   return ejecutar(db().from('alumnos').insert(alumno).select().single())
 }

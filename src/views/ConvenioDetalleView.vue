@@ -231,6 +231,7 @@ onMounted(cargar)
         </select>
         <button class="primary-button" type="submit" :disabled="!alumnoElegido || accion.cargando.value">Inscribir</button>
       </form>
+      <p v-if="esEscuelaAdmin && estado === 'activo' && !alumnosDisponibles.length" class="aviso aviso--info">Todos los alumnos activos ya están inscriptos. <RouterLink class="link-accion" to="/alumnos">Cargar un alumno nuevo</RouterLink></p>
       <p v-else-if="estado !== 'activo'" class="aviso aviso--info">Las inscripciones se habilitan cuando el convenio está activo.</p>
       <p v-if="!inscripciones.length" class="vacio">Todavía no hay alumnos inscriptos.</p>
       <div v-else class="table-wrap">

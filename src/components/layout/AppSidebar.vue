@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { currentUser, ETIQUETA_ROL, organizacion, perfil, rol } from '../../composables/useAuth'
+import { currentUser, errorPerfil, ETIQUETA_ROL, organizacion, perfil, rol } from '../../composables/useAuth'
 import { supabase } from '../../services/supabase'
 import DatosPruebaBadge from '../common/DatosPruebaBadge.vue'
 
@@ -24,14 +24,15 @@ const ITEMS = [
 ]
 
 const navigation = computed(() => {
+  if (!organizacion.value && errorPerfil.value) return []
   if (!organizacion.value) return [{ label: 'Registrar organización', to: '/registro-organizacion', icon: '+' }]
   return ITEMS.filter((item) => !item.tipo || item.tipo === organizacion.value.tipo)
 })
 
 const userName = computed(() => perfil.value?.nombre_completo || currentUser.value?.user_metadata?.full_name || currentUser.value?.email || 'Usuario')
 const initials = (texto) => texto.split(/\s+/).slice(0, 2).map((parte) => parte.charAt(0).toUpperCase()).join('')
-const orgNombre = computed(() => organizacion.value?.nombre || 'Sin organización')
-const orgTipo = computed(() => ETIQUETA_ROL[rol.value] || 'Completá el registro')
+const orgNombre = computed(() => organizacion.value?.nombre || (errorPerfil.value ? 'Sin conexión' : 'Sin organización'))
+const orgTipo = computed(() => ETIQUETA_ROL[rol.value] || (errorPerfil.value ? 'No se pudo cargar la cuenta' : 'Completá el registro'))
 
 async function signOut() {
   signOutError.value = ''

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AuthView from '../views/AuthView.vue'
-import { asegurarPerfil, currentUser, esAdmin, initializeAuth, organizacion } from '../composables/useAuth'
+import { asegurarPerfil, currentUser, errorPerfil, esAdmin, initializeAuth, organizacion } from '../composables/useAuth'
 
 // meta:
 //   requiresAuth  requiere sesión
@@ -19,6 +19,7 @@ const routes = [
   { path: '/convenios', component: () => import('../views/ConveniosView.vue'), meta: { requiresAuth: true, titulo: 'Convenios' } },
   { path: '/convenios/:id', component: () => import('../views/ConvenioDetalleView.vue'), meta: { requiresAuth: true, titulo: 'Detalle del convenio' } },
   { path: '/alumnos', component: () => import('../views/AlumnosView.vue'), meta: { requiresAuth: true, tipo: 'escuela', titulo: 'Alumnos' } },
+  { path: '/alumnos/:id', component: () => import('../views/AlumnoDetalleView.vue'), meta: { requiresAuth: true, tipo: 'escuela', titulo: 'Detalle del alumno' } },
   { path: '/inscripciones', component: () => import('../views/InscripcionesView.vue'), meta: { requiresAuth: true, titulo: 'Inscripciones' } },
   { path: '/inscripciones/:id', component: () => import('../views/InscripcionDetalleView.vue'), meta: { requiresAuth: true, titulo: 'Detalle de la inscripción' } },
   { path: '/seguimientos', component: () => import('../views/SeguimientosView.vue'), meta: { requiresAuth: true, titulo: 'Seguimientos' } },
@@ -42,6 +43,9 @@ router.beforeEach(async (to) => {
   if (!currentUser.value) return true
 
   await asegurarPerfil()
+
+  // No se pudo leer el perfil (sin conexión, base caída): no se redirige; App muestra el error y permite reintentar
+  if (errorPerfil.value) return to.meta.publicAuth ? '/dashboard' : true
 
   if (to.meta.publicAuth) return organizacion.value ? '/dashboard' : '/registro-organizacion'
 
