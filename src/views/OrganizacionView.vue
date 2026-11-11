@@ -83,7 +83,7 @@ onMounted(cargar)
       <div class="seccion-titulo"><h3>Miembros</h3></div>
       <ul class="lista-seguimientos">
         <li v-for="m in miembros" :key="m.id">
-          <div class="cabecera"><span>{{ m.nombre_completo || m.email }}</span><span class="estado estado--azul">{{ ETIQUETA_ROL[m.rol] }}</span></div>
+          <div class="cabecera"><span>{{ m.nombre_completo || m.email }}</span><span><span v-if="!m.activo" class="estado estado--rojo" style="margin-right:6px">Desactivado</span><span class="estado estado--azul">{{ ETIQUETA_ROL[m.rol] }}</span></span></div>
           {{ m.email }}
         </li>
       </ul>
