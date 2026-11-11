@@ -16,9 +16,17 @@ export function db() {
   return supabase
 }
 
-// Devuelve data o lanza el error de Supabase
+const SESION_VENCIDA = /jwt expired|invalid jwt|jwt.*(malformed|invalid)|refresh token/i
+
+// Devuelve data o lanza el error de Supabase.
+// Si la base rechaza el token (sesión vencida), se cierra la sesión local: App redirige al login.
 export async function ejecutar(consulta) {
   const { data, error } = await consulta
-  if (error) throw error
+  if (error) {
+    if (error.code === 'PGRST301' || error.code === 'PGRST303' || SESION_VENCIDA.test(error.message || '')) {
+      await supabase?.auth.signOut({ scope: 'local' })
+    }
+    throw error
+  }
   return data
 }

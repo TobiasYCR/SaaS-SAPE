@@ -19,7 +19,9 @@ export const organizacion = computed(() => {
   return null
 })
 
-export const rol = computed(() => perfil.value?.rol ?? null)
+// Un usuario desactivado no tiene permisos en la base (mi_rol() devuelve null): la app tampoco los muestra
+export const cuentaDesactivada = computed(() => perfil.value?.activo === false)
+export const rol = computed(() => (cuentaDesactivada.value ? null : perfil.value?.rol ?? null))
 export const esEscuela = computed(() => organizacion.value?.tipo === 'escuela')
 export const esEmpresa = computed(() => organizacion.value?.tipo === 'empresa')
 export const esAdmin = computed(() => ['escuela_admin', 'empresa_admin'].includes(rol.value))

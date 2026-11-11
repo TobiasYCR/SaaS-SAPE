@@ -1,14 +1,17 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
+import FormAlumno from '../components/alumnos/FormAlumno.vue'
+import { aFormulario, guardarAlumno, nombreCompleto, quitarAlumno, reactivar } from '../components/alumnos/accionesAlumno'
 import AvisoOperacion from '../components/common/AvisoOperacion.vue'
 import EstadoBadge from '../components/common/EstadoBadge.vue'
-import { rol } from '../composables/useAuth'
+import { organizacion, rol } from '../composables/useAuth'
 import { useOperacion } from '../composables/useOperacion'
 import { obtenerAlumno } from '../services/alumnosService'
 import { listarConvenios } from '../services/conveniosService'
 import { inscribirAlumno, listarInscripciones } from '../services/inscripcionesService'
 import { formatearFecha } from '../utils/catalogos'
+import { hayErrores, validarAlumno } from '../utils/validaciones'
 
 // Función principal: desde el alumno se elige un convenio activo y se lo inscribe.
 const route = useRoute()
@@ -20,11 +23,16 @@ const inscripciones = ref([])
 const convenios = ref([])
 const convenioElegido = ref('')
 const errorInscripcion = ref('')
+const formulario = ref(null) // modificación: null = cerrado
+const errores = ref({})
 
 const carga = useOperacion()
 const inscripcion = useOperacion()
+const edicion = useOperacion()
+const accion = useOperacion()
 
-const puedeInscribir = computed(() => rol.value === 'escuela_admin' && alumno.value?.activo)
+const esAdminEscuela = computed(() => rol.value === 'escuela_admin')
+const puedeInscribir = computed(() => esAdminEscuela.value && alumno.value?.activo)
 // Convenios activos en los que el alumno todavía no está inscripto
 const disponibles = computed(() => {
   const inscriptos = new Set(inscripciones.value.map((i) => i.convenio_id))
@@ -48,6 +56,35 @@ async function inscribir() {
   if (nueva) router.push({ path: `/inscripciones/${nueva.id}`, query: { nueva: '1' } })
 }
 
+function modificar() {
+  formulario.value = aFormulario(alumno.value)
+  errores.value = {}
+  edicion.limpiar()
+}
+
+// Mismas reglas que el alta: validarAlumno en pantalla y CHECK/UNIQUE en la base
+async function guardar() {
+  errores.value = validarAlumno(formulario.value)
+  if (hayErrores(errores.value)) return
+  const guardado = await guardarAlumno(edicion, { id, escuelaId: organizacion.value.id, formulario: formulario.value })
+  if (!guardado) return
+  alumno.value = guardado
+  formulario.value = null
+  accion.limpiar()
+  accion.exito.value = edicion.exito.value
+}
+
+async function quitar() {
+  const resultado = await quitarAlumno(accion, alumno.value, inscripciones.value.length)
+  if (resultado === 'eliminado') router.replace({ path: '/alumnos', query: { eliminado: nombreCompleto(alumno.value) } })
+  else if (resultado === 'baja') alumno.value = { ...alumno.value, activo: false }
+}
+
+async function reactivarAlumno() {
+  const actualizado = await reactivar(accion, alumno.value)
+  if (actualizado) alumno.value = actualizado
+}
+
 onMounted(cargar)
 </script>
 
@@ -61,9 +98,20 @@ onMounted(cargar)
   </section>
 
   <AvisoOperacion :cargando="carga.cargando.value" texto-cargando="Cargando alumno..." :error="carga.error.value" />
+  <AvisoOperacion :error="accion.error.value" :exito="accion.exito.value" />
 
   <template v-if="alumno">
-    <section class="panel seccion">
+    <form v-if="formulario" class="panel formulario seccion" novalidate @submit.prevent="guardar">
+      <div class="seccion-titulo"><h3>Modificar alumno</h3></div>
+      <FormAlumno v-model="formulario" :errores="errores" />
+      <AvisoOperacion :error="edicion.error.value" />
+      <div class="acciones acciones--fin">
+        <button class="filter-button" type="button" @click="formulario = null">Cancelar</button>
+        <button class="primary-button" type="submit" :disabled="edicion.cargando.value">{{ edicion.cargando.value ? 'Guardando...' : 'Guardar cambios' }}</button>
+      </div>
+    </form>
+
+    <section v-else class="panel seccion">
       <dl class="detalle">
         <div><dt>DNI</dt><dd>{{ alumno.dni }}</dd></div>
         <div><dt>Curso</dt><dd>{{ alumno.curso ? `${alumno.curso}° ${alumno.division || ''}` : '—' }}</dd></div>
@@ -73,11 +121,16 @@ onMounted(cargar)
         <div><dt>Teléfono</dt><dd>{{ alumno.telefono || '—' }}</dd></div>
         <div><dt>Responsable</dt><dd>{{ alumno.responsable_nombre || '—' }}{{ alumno.responsable_telefono ? ` · ${alumno.responsable_telefono}` : '' }}</dd></div>
       </dl>
+      <div v-if="esAdminEscuela" class="acciones" style="margin-top:18px">
+        <button class="secondary-button" type="button" @click="modificar">Modificar datos</button>
+        <button v-if="alumno.activo" class="boton-peligro" type="button" :disabled="accion.cargando.value" @click="quitar">{{ inscripciones.length ? 'Dar de baja' : 'Eliminar' }}</button>
+        <button v-else class="secondary-button" type="button" :disabled="accion.cargando.value" @click="reactivarAlumno">Reactivar</button>
+      </div>
     </section>
 
     <section class="panel seccion">
       <div class="seccion-titulo"><h3>Inscribir en una pasantía</h3></div>
-      <p v-if="!alumno.activo" class="aviso aviso--info">El alumno está dado de baja. Reactivalo desde Alumnos para inscribirlo.</p>
+      <p v-if="!alumno.activo" class="aviso aviso--info">El alumno está dado de baja. Reactivalo para poder inscribirlo.</p>
       <p v-else-if="rol !== 'escuela_admin'" class="aviso aviso--info">Solo el administrador de la escuela inscribe alumnos.</p>
       <p v-else-if="!disponibles.length" class="aviso aviso--info">
         No hay convenios activos disponibles para este alumno. Los convenios se activan cuando una empresa se postula, la escuela acepta y se configuran los requisitos.

@@ -93,3 +93,4 @@ button:disabled{opacity:.55;cursor:not-allowed}
 }
 .product-action{font-size:12px;padding:8px 11px;min-height:34px}
 .stat-card{display:block}
+a.product-action{text-decoration:none;display:inline-flex;align-items:center}
