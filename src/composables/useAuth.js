@@ -1,10 +1,14 @@
 import { computed, ref } from 'vue'
 import { hasPlaceholderCredentials, supabase } from '../services/supabase'
 import { obtenerMiPerfil } from '../services/perfilService'
+import { traducirError } from '../utils/errores'
 
 export const currentUser = ref(null)
 export const perfil = ref(null)
 export const authError = ref('')
+// Error al leer el perfil (por ejemplo, sin conexión): no significa que el usuario no tenga organización
+export const errorPerfil = ref('')
+export const cargandoPerfil = ref(false)
 
 // Organización del usuario: { tipo: 'escuela' | 'empresa', id, nombre, datosPrueba } o null
 export const organizacion = computed(() => {
@@ -35,15 +39,17 @@ async function cargarPerfil(user) {
   if (!user) {
     perfil.value = null
     perfilCargadoPara = null
+    errorPerfil.value = ''
     return
   }
   try {
     perfil.value = await obtenerMiPerfil(user.id)
     perfilCargadoPara = user.id
+    errorPerfil.value = ''
   } catch (error) {
     perfil.value = null
     perfilCargadoPara = null
-    authError.value = error.message || 'No se pudo cargar el perfil.'
+    errorPerfil.value = traducirError(error)
   }
 }
 
@@ -51,7 +57,11 @@ async function cargarPerfil(user) {
 export async function asegurarPerfil() {
   const user = currentUser.value
   if (!user || perfilCargadoPara === user.id) return
-  cargaPendiente ??= cargarPerfil(user).finally(() => { cargaPendiente = null })
+  cargandoPerfil.value = true
+  cargaPendiente ??= cargarPerfil(user).finally(() => {
+    cargaPendiente = null
+    cargandoPerfil.value = false
+  })
   await cargaPendiente
 }
 

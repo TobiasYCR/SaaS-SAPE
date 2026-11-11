@@ -259,7 +259,7 @@ $$;
 
 -- actualizado_en automático
 create function public.tocar_actualizado_en() returns trigger
-language plpgsql as $$
+language plpgsql set search_path = '' as $$
 begin
   new.actualizado_en := now();
   return new;
@@ -535,6 +535,12 @@ end $$;
 revoke all on all tables in schema public from anon;
 revoke execute on all functions in schema public from anon, public;
 grant execute on all functions in schema public to authenticated;
+-- Las funciones de trigger no se exponen como RPC (el trigger no necesita EXECUTE del usuario)
+revoke execute on function
+  public.tocar_actualizado_en(), public.crear_perfil_nuevo_usuario(),
+  public.validar_convenio(), public.validar_requisito(), public.validar_inscripcion(),
+  public.validar_dato_inscripcion(), public.validar_seguimiento()
+from public, anon, authenticated;
 
 grant select, insert, update, delete on
   public.escuelas, public.empresas, public.alumnos, public.convenios,

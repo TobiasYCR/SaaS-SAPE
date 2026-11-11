@@ -2,9 +2,10 @@ import { db, ejecutar } from './supabase'
 
 const SELECT_INSCRIPCION = '*, alumno:alumnos(id, nombre, apellido, dni, curso, division, especialidad), convenio:convenios(id, area, estado, cupos, empresa:empresas(id, razon_social, nombre_fantasia, datos_prueba), escuela:escuelas(id, nombre, datos_prueba))'
 
-export function listarInscripciones({ convenioId = '', estado = '' } = {}) {
+export function listarInscripciones({ convenioId = '', alumnoId = '', estado = '' } = {}) {
   let consulta = db().from('inscripciones').select(SELECT_INSCRIPCION).order('actualizado_en', { ascending: false })
   if (convenioId) consulta = consulta.eq('convenio_id', convenioId)
+  if (alumnoId) consulta = consulta.eq('alumno_id', alumnoId)
   if (estado) consulta = Array.isArray(estado) ? consulta.in('estado', estado) : consulta.eq('estado', estado)
   return ejecutar(consulta)
 }

@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import AvisoOperacion from '../components/common/AvisoOperacion.vue'
 import CampoFormulario from '../components/common/CampoFormulario.vue'
 import EstadoBadge from '../components/common/EstadoBadge.vue'
@@ -18,6 +19,7 @@ const estado = ref('activos')
 const formulario = ref(null) // null = cerrado
 const editandoId = ref(null)
 const errores = ref({})
+const ultimoCreado = ref(null) // para ofrecer el paso siguiente: inscribirlo
 
 const puedeEditar = computed(() => rol.value === 'escuela_admin')
 const listado = useOperacion()
@@ -33,6 +35,7 @@ async function cargar() {
 }
 
 function nuevo() {
+  ultimoCreado.value = null
   editandoId.value = null
   formulario.value = { ...VACIO }
   errores.value = {}
@@ -57,6 +60,7 @@ async function guardar() {
     ? await guardado.ejecutar(() => actualizarAlumno(editandoId.value, datos), `Se actualizaron los datos de ${nombre}.`)
     : await guardado.ejecutar(() => crearAlumno({ ...datos, escuela_id: organizacion.value.id }), `${nombre} se agregó a la escuela.`)
   if (ok) {
+    ultimoCreado.value = editandoId.value ? null : ok
     formulario.value = null
     accion.exito.value = guardado.exito.value
     await cargar()
@@ -65,6 +69,7 @@ async function guardar() {
 
 // Con inscripciones: baja lógica para conservar el historial. Sin inscripciones: se puede eliminar.
 async function quitar(alumno) {
+  ultimoCreado.value = null
   const nombre = `${alumno.apellido}, ${alumno.nombre}`
   if (cantidadInscripciones(alumno) > 0) {
     if (!window.confirm(`${nombre} tiene inscripciones. Se va a dar de baja (queda en el historial y se puede reactivar). ¿Continuar?`)) return
@@ -77,6 +82,7 @@ async function quitar(alumno) {
 }
 
 async function reactivar(alumno) {
+  ultimoCreado.value = null
   await accion.ejecutar(() => reactivarAlumno(alumno.id), `${alumno.apellido}, ${alumno.nombre} volvió a estar activo.`)
   await cargar()
 }
@@ -91,6 +97,9 @@ onMounted(cargar)
   </section>
 
   <AvisoOperacion :error="accion.error.value" :exito="accion.exito.value" />
+  <p v-if="ultimoCreado && accion.exito.value" class="aviso aviso--info">
+    Siguiente paso: <RouterLink class="link-accion" :to="`/alumnos/${ultimoCreado.id}`">inscribir a {{ ultimoCreado.nombre }} en una pasantía →</RouterLink>
+  </p>
 
   <form v-if="formulario" class="panel formulario seccion" novalidate @submit.prevent="guardar">
     <div class="seccion-titulo"><h3>{{ editandoId ? 'Editar alumno' : 'Nuevo alumno' }}</h3></div>
@@ -130,7 +139,7 @@ onMounted(cargar)
         <thead><tr><th>ALUMNO</th><th>DNI</th><th>CURSO</th><th>ESPECIALIDAD</th><th>INSCRIPCIONES</th><th>ESTADO</th><th v-if="puedeEditar">ACCIONES</th></tr></thead>
         <tbody>
           <tr v-for="a in alumnos" :key="a.id">
-            <td><strong>{{ a.apellido }}, {{ a.nombre }}</strong><small>Nac.: {{ formatearFecha(a.fecha_nacimiento) }}</small></td>
+            <td><RouterLink class="link-accion" :to="`/alumnos/${a.id}`"><strong>{{ a.apellido }}, {{ a.nombre }}</strong></RouterLink><small>Nac.: {{ formatearFecha(a.fecha_nacimiento) }}</small></td>
             <td>{{ a.dni }}</td>
             <td>{{ a.curso ? `${a.curso}° ${a.division || ''}` : '—' }}</td>
             <td>{{ a.especialidad || '—' }}</td>
@@ -138,6 +147,7 @@ onMounted(cargar)
             <td><EstadoBadge :estado="a.activo ? 'activo_alumno' : 'inactivo'" :etiqueta="a.activo ? 'Activo' : 'De baja'" /></td>
             <td v-if="puedeEditar">
               <div class="acciones">
+                <RouterLink class="product-action" :to="`/alumnos/${a.id}`">Inscribir</RouterLink>
                 <button class="product-action" type="button" @click="editar(a)">Editar</button>
                 <button v-if="a.activo" class="product-action product-action--danger" type="button" :disabled="accion.cargando.value" @click="quitar(a)">{{ cantidadInscripciones(a) ? 'Dar de baja' : 'Eliminar' }}</button>
                 <button v-else class="product-action" type="button" :disabled="accion.cargando.value" @click="reactivar(a)">Reactivar</button>
