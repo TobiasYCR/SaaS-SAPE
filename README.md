@@ -32,10 +32,15 @@ Stack: Vue 3 + Vite + Vue Router + Supabase (Auth, PostgreSQL, Storage).
 |---|---|
 | `supabase/tests/pruebas_rls.sql` | Aislamiento entre organizaciones y reglas de negocio (26 casos) |
 | `supabase/tests/flujo_completo.sql` | Recorrido completo con usuarios nuevos (50 casos) |
+| `supabase/tests/funcion_principal.sql` | Inscripción de un alumno de punta a punta, con datos faltantes e inválidos (30 casos, no deja datos) |
 | `supabase/tests/verificacion.sql` | Consultas de solo lectura sobre las relaciones |
 
 `npm run lint` y `npm run build` deben terminar sin errores.
 
 ## Documentación
 
-`docs/`: análisis y entidades, DER, diccionario de datos y estructura del proyecto.
+`docs/`: análisis y entidades, DER, diccionario de datos, estructura del proyecto y función principal.
+
+## Base existente
+
+Ejecutar en orden las migraciones de `supabase/migraciones/` que todavía no se aplicaron.

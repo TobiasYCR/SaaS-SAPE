@@ -182,6 +182,9 @@ onMounted(cargar)
 
   <AvisoOperacion :cargando="carga.cargando.value" texto-cargando="Cargando inscripción..." :error="carga.error.value" />
   <AvisoOperacion :error="accion.error.value" :exito="accion.exito.value" />
+  <p v-if="route.query.nueva && estado === 'borrador'" class="aviso aviso--exito" role="status">
+    Inscripción creada en borrador. Completá los datos de inscripción, guardalos y enviala a la empresa.
+  </p>
 
   <template v-if="inscripcion">
     <section class="panel seccion">

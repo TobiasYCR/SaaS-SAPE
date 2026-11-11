@@ -12,7 +12,7 @@ SaaS-SAPE/
 │  │  ├─ RegistroOrganizacion   Alta de la escuela o empresa del usuario
 │  │  ├─ Dashboard              Resumen, pendientes y próximos seguimientos
 │  │  ├─ Escuelas / Empresas    Directorios con búsqueda y filtros (la empresa se postula)
-│  │  ├─ Alumnos                ABM de alumnos (solo escuelas)
+│  │  ├─ Alumnos / Detalle      ABM de alumnos e inscripción a una pasantía (solo escuelas)
 │  │  ├─ Convenios / Detalle    Postulaciones, estados y requisitos
 │  │  ├─ Inscripciones / Detalle  Datos de requisitos, estados y seguimientos
 │  │  ├─ Seguimientos           Progreso de pasantías
@@ -39,11 +39,13 @@ SaaS-SAPE/
 │  ├─ schema.sql                Tablas, tipos, FKs, CHECKs, triggers, RPC, RLS y Storage
 │  ├─ seed.sql                  Datos ficticios (2 escuelas, 3 empresas), marcados como prueba
 │  ├─ migraciones/
-│  │  └─ 002_version1.sql       Lleva una base de la etapa anterior a la versión 1
+│  │  ├─ 002_version1.sql       Lleva una base de la etapa anterior a la versión 1
+│  │  └─ 003_seguridad.sql      Ajustes del Security Advisor de Supabase
 │  └─ tests/
 │     ├─ verificacion.sql       Consultas para revisar relaciones
 │     ├─ pruebas_rls.sql        Aislamiento entre organizaciones (tabla OK/FALLA)
-│     └─ flujo_completo.sql     Recorrido completo con usuarios nuevos (tabla OK/FALLA)
+│     ├─ flujo_completo.sql     Recorrido completo con usuarios nuevos (tabla OK/FALLA)
+│     └─ funcion_principal.sql  Inscripción de un alumno, con ROLLBACK (no deja datos)
 ├─ docs/                        Análisis, DER, diccionario y esta estructura
 └─ public/                      Archivos estáticos servidos tal cual
 ```
@@ -59,4 +61,4 @@ SQL Editor de Supabase, en este orden:
 3. `supabase/seed.sql`
 4. `supabase/tests/pruebas_rls.sql` y `supabase/tests/flujo_completo.sql` (opcional; modifican datos)
 
-Base creada con la etapa anterior y con datos a conservar: ejecutar solo `supabase/migraciones/002_version1.sql`.
+Base existente con datos a conservar: ejecutar las migraciones que falten de `supabase/migraciones/`, en orden.
