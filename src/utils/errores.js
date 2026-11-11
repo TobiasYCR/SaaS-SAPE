@@ -22,6 +22,7 @@ const POR_TEXTO = [
   [/failed to fetch|network/i, 'No hay conexión con el servidor. Revisá tu conexión e intentá de nuevo.'],
   [/could not find the table|schema cache/i, 'La base de datos no está configurada. Ejecutá supabase/schema.sql.'],
   [/invalid login credentials/i, 'Email o contraseña incorrectos.'],
+  [/jwt expired|invalid jwt|refresh token/i, 'Tu sesión venció. Iniciá sesión de nuevo.'],
   [/email not confirmed/i, 'Confirmá tu email antes de iniciar sesión.'],
 ]
 

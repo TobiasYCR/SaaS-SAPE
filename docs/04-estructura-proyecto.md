@@ -21,6 +21,7 @@ SaaS-SAPE/
 │  ├─ components/
 │  │  ├─ layout/                Estructura fija (AppSidebar, AppTopbar)
 │  │  ├─ common/                Avisos, campo de formulario, etiquetas de estado y de prueba
+│  │  ├─ alumnos/               Formulario y acciones del alumno (alta, modificación, baja)
 │  │  ├─ organizacion/          Formularios de escuela y empresa
 │  │  └─ convenios/             Formulario de propuesta
 │  ├─ router/
@@ -45,7 +46,8 @@ SaaS-SAPE/
 │     ├─ verificacion.sql       Consultas para revisar relaciones
 │     ├─ pruebas_rls.sql        Aislamiento entre organizaciones (tabla OK/FALLA)
 │     ├─ flujo_completo.sql     Recorrido completo con usuarios nuevos (tabla OK/FALLA)
-│     └─ funcion_principal.sql  Inscripción de un alumno, con ROLLBACK (no deja datos)
+│     ├─ funcion_principal.sql  Inscripción de un alumno, con ROLLBACK (no deja datos)
+│     └─ roles_alumnos.sql      Matriz de permisos por rol, con ROLLBACK (no deja datos)
 ├─ docs/                        Análisis, DER, diccionario y esta estructura
 └─ public/                      Archivos estáticos servidos tal cual
 ```
