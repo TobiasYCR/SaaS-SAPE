@@ -1,4 +1,4 @@
-import { hoy } from './catalogos'
+import { hoy } from './catalogos.js'
 
 // Validaciones de formularios. Cada validador devuelve un objeto { campo: mensaje }.
 // Las mismas reglas están en la base (CHECK y triggers); acá se anticipan para avisar antes de enviar.
@@ -66,6 +66,13 @@ export function validarValorRequisito(tipo, valor) {
   if (tipo === 'numero' && !/^-?\d+([.,]\d+)?$/.test(valor)) return 'Debe ser un número.'
   if (tipo === 'si_no' && !['si', 'no'].includes(valor)) return 'Elegí sí o no.'
   if (tipo === 'fecha' && Number.isNaN(Date.parse(valor))) return 'Fecha inválida.'
+  return ''
+}
+
+export function validarArchivo(archivo) {
+  if (!archivo) return ''
+  if (!['application/pdf', 'image/jpeg', 'image/png'].includes(archivo.type)) return 'Solo PDF, JPG o PNG.'
+  if (archivo.size > 10 * 1024 * 1024) return 'El archivo no puede superar los 10 MB.'
   return ''
 }
 
