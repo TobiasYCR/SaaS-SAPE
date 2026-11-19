@@ -34,9 +34,10 @@ Stack: Vue 3 + Vite + Vue Router + Supabase (Auth, PostgreSQL, Storage).
 | `supabase/tests/flujo_completo.sql` | Recorrido completo con usuarios nuevos (50 casos) |
 | `supabase/tests/funcion_principal.sql` | Inscripción de un alumno de punta a punta, con datos faltantes e inválidos (30 casos, no deja datos) |
 | `supabase/tests/roles_alumnos.sql` | Qué puede hacer cada rol en el módulo Alumnos y aislamiento entre organizaciones (45 casos, no deja datos) |
+| `supabase/tests/seguridad_documentos_usuarios.sql` | Documentos privados, cambio de rol, desactivación/reactivación y aislamiento (13 casos, no deja datos) |
 | `supabase/tests/verificacion.sql` | Consultas de solo lectura sobre las relaciones |
 
-`npm run lint` y `npm run build` deben terminar sin errores.
+`npm test`, `npm run lint` y `npm run build` deben terminar sin errores.
 
 ## Documentación
 

@@ -3,9 +3,11 @@
 -- Reproduce, con usuarios nuevos, las mismas operaciones que hacen las
 -- pantallas (src/services/). Devuelve una tabla OK / FALLA.
 -- Ejecutar en el SQL Editor después de schema.sql (con o sin seed.sql).
--- Crea usuarios @flujo.test y organizaciones nuevas; al inicio borra las
--- de una corrida anterior.
+-- Crea usuarios @flujo.test y organizaciones nuevas dentro de una
+-- transaccion; termina con ROLLBACK y no deja cambios persistentes.
 -- =====================================================================
+
+begin;
 
 delete from public.inscripciones where escuela_id in (select id from public.escuelas where cue = '111111111');
 delete from auth.users where email like '%@flujo.test';
@@ -168,3 +170,5 @@ select pg_temp.paso('Historial conservado (inscripción + seguimiento)', '1', '1
   format($q$select count(*) from inscripciones i join seguimientos s on s.inscripcion_id = i.id where i.id = %L$q$, pg_temp.id('inscA')));
 
 select resultado, prueba, detalle from resultados order by n;
+
+rollback;

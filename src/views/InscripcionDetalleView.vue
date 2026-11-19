@@ -13,7 +13,7 @@ import {
 } from '../services/inscripcionesService'
 import { crearSeguimiento, eliminarSeguimiento, listarSeguimientos } from '../services/seguimientosService'
 import { formatearFecha, hoy } from '../utils/catalogos'
-import { hayErrores, limpiarVacios, validarInscripcion, validarSeguimiento, validarValorRequisito } from '../utils/validaciones'
+import { hayErrores, limpiarVacios, validarArchivo, validarInscripcion, validarSeguimiento, validarValorRequisito } from '../utils/validaciones'
 
 const route = useRoute()
 const router = useRouter()
@@ -89,9 +89,8 @@ function elegirArchivo(reqId, evento) {
   const archivo = evento.target.files?.[0]
   erroresDatos.value[reqId] = ''
   if (!archivo) return
-  if (!['application/pdf', 'image/jpeg', 'image/png'].includes(archivo.type)) erroresDatos.value[reqId] = 'Solo PDF, JPG o PNG.'
-  else if (archivo.size > 10 * 1024 * 1024) erroresDatos.value[reqId] = 'El archivo no puede superar los 10 MB.'
-  else archivos.value[reqId] = archivo
+  erroresDatos.value[reqId] = validarArchivo(archivo)
+  if (!erroresDatos.value[reqId]) archivos.value[reqId] = archivo
   if (erroresDatos.value[reqId]) evento.target.value = ''
 }
 

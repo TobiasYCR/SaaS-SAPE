@@ -24,3 +24,13 @@ export function registrarOrganizacion(tipo, datos) {
 export function asignarMiembro(email, rol) {
   return ejecutar(db().rpc('asignar_miembro', { p_email: email, p_rol: rol }))
 }
+
+// Permite a un administrador cambiar el rol o habilitar/deshabilitar a un
+// miembro de su propia organizacion. La RPC valida organizacion y permisos.
+export function actualizarMiembro(usuarioId, rol, activo) {
+  return ejecutar(db().rpc('actualizar_miembro', {
+    p_usuario: usuarioId,
+    p_rol: rol,
+    p_activo: activo,
+  }))
+}
