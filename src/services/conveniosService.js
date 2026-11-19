@@ -1,6 +1,6 @@
 import { db, ejecutar } from './supabase'
 
-const SELECT_CONVENIO = '*, empresa:empresas(id, razon_social, nombre_fantasia, datos_prueba), escuela:escuelas(id, nombre, localidad, datos_prueba), inscripciones(count)'
+const SELECT_CONVENIO = '*, empresa:empresas(*), escuela:escuelas(*), inscripciones(count)'
 
 // Devuelve solo los convenios donde la organización del usuario es parte (RLS)
 export function listarConvenios({ estado = '', ciclo = '' } = {}) {
@@ -15,15 +15,19 @@ export function obtenerConvenio(id) {
 }
 
 // Empresa elige una escuela y se postula. Queda en estado 'postulado'.
-export function postularse({ empresa_id, escuela_id, ciclo_lectivo, cupos, area, descripcion, fecha_inicio, fecha_fin }) {
+export function postularse({ empresa_id, escuela_id, ciclo_lectivo, cupos, area, descripcion, fecha_inicio, fecha_fin,
+  numero_plan, fecha_carga, tipo_plan, visto }) {
   return ejecutar(db().from('convenios')
-    .insert({ empresa_id, escuela_id, ciclo_lectivo, cupos, area, descripcion, fecha_inicio, fecha_fin })
+    .insert({ empresa_id, escuela_id, ciclo_lectivo, cupos, area, descripcion, fecha_inicio, fecha_fin,
+      numero_plan, fecha_carga, tipo_plan, visto })
     .select().single())
 }
 
 // Propuesta: solo la empresa, mientras el convenio está postulado o aceptado (trigger)
-export function actualizarPropuesta(id, { area, descripcion, cupos, fecha_inicio, fecha_fin }) {
-  return ejecutar(db().from('convenios').update({ area, descripcion, cupos, fecha_inicio, fecha_fin }).eq('id', id).select().single())
+export function actualizarPropuesta(id, { area, descripcion, cupos, fecha_inicio, fecha_fin, numero_plan, fecha_carga, tipo_plan, visto, disposicion }) {
+  return ejecutar(db().from('convenios').update({
+    area, descripcion, cupos, fecha_inicio, fecha_fin, numero_plan, fecha_carga, tipo_plan, visto, disposicion,
+  }).eq('id', id).select().single())
 }
 
 // Transiciones válidas (las controla la base):
@@ -53,4 +57,44 @@ export function actualizarRequisito(id, { nombre, descripcion, tipo, obligatorio
 
 export function eliminarRequisito(id) {
   return ejecutar(db().from('requisitos').delete().eq('id', id))
+}
+
+export function actualizarDatosPlan(id, datos) {
+  return ejecutar(db().from('convenios').update(datos).eq('id', id).select().single())
+}
+
+export function listarDocumentosPlan(convenioId) {
+  return ejecutar(db().from('documentos_plan').select('*').eq('convenio_id', convenioId).order('creado_en', { ascending: false }))
+}
+
+export async function subirDocumentoPlan(convenioId, archivo, descripcion = '') {
+  if (!archivo) throw new Error('Seleccioná un archivo.')
+  const seguro = archivo.name.normalize('NFKD').replace(/[^\w.-]+/g, '-').replace(/^-+|-+$/g, '') || 'anexo'
+  const ruta = `${convenioId}/planes/${Date.now()}-${seguro}`
+  const subido = await ejecutar(db().storage.from('documentos').upload(ruta, archivo, {
+    contentType: archivo.type,
+    cacheControl: '3600',
+    upsert: false,
+  }))
+  if (!subido) throw new Error('No se pudo subir el archivo.')
+  return ejecutar(db().from('documentos_plan').insert({
+    convenio_id: convenioId,
+    nombre: archivo.name,
+    descripcion: descripcion.trim() || null,
+    ruta,
+    tipo_mime: archivo.type || null,
+    tamano: archivo.size,
+  }).select().single())
+}
+
+export async function abrirDocumentoPlan(ruta) {
+  const { data, error } = await db().storage.from('documentos').createSignedUrl(ruta, 300)
+  if (error) throw error
+  if (!data?.signedUrl) throw new Error('No se pudo abrir el documento.')
+  window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
+}
+
+export function eliminarDocumentoPlan(documento) {
+  return ejecutar(db().storage.from('documentos').remove([documento.ruta]))
+    .then(() => ejecutar(db().from('documentos_plan').delete().eq('id', documento.id)))
 }

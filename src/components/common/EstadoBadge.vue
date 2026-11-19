@@ -6,6 +6,7 @@ import { ESTADOS_CONVENIO, ESTADOS_INSCRIPCION } from '../../utils/catalogos'
 const COLOR = {
   postulado: 'azul', aceptado: 'violeta', activo: 'verde', rechazado: 'rojo', finalizado: 'gris', cancelado: 'gris',
   borrador: 'gris', enviada: 'azul', aceptada: 'violeta', en_curso: 'verde', rechazada: 'rojo', finalizada: 'gris', cancelada: 'gris',
+  presentado: 'azul', autorizado: 'verde', disposicion_generada: 'verde', observado: 'rojo',
   activo_alumno: 'verde', inactivo: 'gris',
 }
 

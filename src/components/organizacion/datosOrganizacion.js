@@ -1,8 +1,16 @@
 // Conversión entre el formulario y las columnas de escuelas / empresas
 import { limpiarVacios } from '../../utils/validaciones'
 
-const CAMPOS_ESCUELA = ['nombre', 'cue', 'modalidad', 'descripcion', 'direccion', 'localidad', 'provincia', 'email', 'telefono']
-const CAMPOS_EMPRESA = ['razon_social', 'nombre_fantasia', 'cuit', 'rubro', 'descripcion', 'direccion', 'localidad', 'provincia', 'email', 'telefono', 'sitio_web']
+const CAMPOS_ESCUELA = [
+  'nombre', 'cue', 'numero_escuela', 'departamento', 'distrito', 'codigo_postal',
+  'anio_inicio', 'ambito', 'gestion', 'director', 'modalidad', 'descripcion',
+  'direccion', 'localidad', 'provincia', 'email', 'telefono', 'sitio_web',
+]
+const CAMPOS_EMPRESA = [
+  'razon_social', 'nombre_fantasia', 'cuit', 'rubro', 'referente_nombre', 'referente_cargo',
+  'referente_email', 'referente_telefono', 'descripcion', 'direccion', 'localidad', 'provincia',
+  'email', 'telefono', 'sitio_web',
+]
 
 export function formularioVacio(tipo) {
   const campos = tipo === 'escuela' ? CAMPOS_ESCUELA : CAMPOS_EMPRESA

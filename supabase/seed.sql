@@ -15,6 +15,9 @@
 --   convenios      4000…000x
 --   requisitos     5000…0xyy  (x = convenio)
 --   inscripciones  6000…000x
+-- Incluye 10 alumnos adicionales, cinco en cada escuela, inscriptos en
+-- convenios activos de Pixel Andino y Cooperativa Norte.
+-- Incluye tres alumnos adicionales de Río Claro y un convenio activo con Grupo Delta.
 -- =====================================================================
 
 insert into public.escuelas (id, nombre, cue, modalidad, especialidades, descripcion, direccion, localidad, provincia, email, telefono, datos_prueba) values
@@ -25,14 +28,17 @@ insert into public.escuelas (id, nombre, cue, modalidad, especialidades, descrip
    '{"Economía y Administración","Comunicación"}', 'Secundaria orientada de gestión privada.',
    'Calle Falsa 456', 'Córdoba', 'Córdoba', 'secretaria@losaromos.edu.test', '351 400-0002', true);
 
-insert into public.empresas (id, razon_social, nombre_fantasia, cuit, rubro, descripcion, direccion, localidad, provincia, email, telefono, sitio_web, datos_prueba) values
+insert into public.empresas (id, razon_social, nombre_fantasia, cuit, rubro, referente_nombre, referente_cargo, referente_email, referente_telefono, descripcion, direccion, localidad, provincia, email, telefono, sitio_web, datos_prueba) values
   ('20000000-0000-4000-8000-000000000001', 'Pixel Andino S.R.L.', 'Pixel Andino', '30700000011', 'Software',
+   'Mariana Torres', 'Responsable de RRHH', 'mariana.torres@pixelandino.test', '11 5000-0101',
    'Estudio de desarrollo web y diseño UX.', 'Av. Corrientes 1000', 'CABA', 'Buenos Aires',
    'rrhh@pixelandino.test', '11 5000-0001', 'https://pixelandino.test', true),
   ('20000000-0000-4000-8000-000000000002', 'Cooperativa Norte Ltda.', 'Coop. Norte', '30700000022', 'Servicios IT',
+   'Diego Benítez', 'Coordinador técnico', 'diego.benitez@coopnorte.test', '341 500-0102',
    'Cooperativa de soporte técnico y redes.', 'Bv. Oroño 300', 'Rosario', 'Santa Fe',
    'pasantias@coopnorte.test', '341 500-0002', null, true),
   ('20000000-0000-4000-8000-000000000003', 'Grupo Delta S.A.', 'Delta', '30700000033', 'Contabilidad',
+   'Luciana Rivas', 'Referente de prácticas', 'luciana.rivas@grupodelta.test', '261 500-0103',
    'Estudio contable y administrativo.', 'San Martín 50', 'Mendoza', 'Mendoza',
    'info@grupodelta.test', '261 500-0003', null, true);
 
@@ -47,13 +53,27 @@ insert into public.alumnos (id, escuela_id, nombre, apellido, dni, fecha_nacimie
   ('30000000-0000-4000-8000-000000000202', '10000000-0000-4000-8000-000000000002', 'Nicolás',  'Acosta',    '45000202', '2008-09-17', 5, 'U', 'Economía y Administración', 'nico.a@alumnos.test', 'Raúl Acosta', '351 600-0202'),
   ('30000000-0000-4000-8000-000000000203', '10000000-0000-4000-8000-000000000002', 'Camila',   'Suárez',    '45000203', '2008-12-01', 5, 'U', 'Comunicación', null,                    'Silvia Suárez',   '351 600-0203'),
   -- Mismo DNI que un alumno de la otra escuela: permitido (unique es por escuela)
-  ('30000000-0000-4000-8000-000000000204', '10000000-0000-4000-8000-000000000002', 'Joaquín',  'Ledesma',   '45000101', '2009-04-22', 4, 'U', 'Economía y Administración', null, 'Inés Ledesma', '351 600-0204');
+  ('30000000-0000-4000-8000-000000000204', '10000000-0000-4000-8000-000000000002', 'Joaquín',  'Ledesma',   '45000101', '2009-04-22', 4, 'U', 'Economía y Administración', null, 'Inés Ledesma', '351 600-0204'),
+  -- Alumnos adicionales para demostrar inscripciones en las dos empresas activas
+  ('30000000-0000-4000-8000-000000000301', '10000000-0000-4000-8000-000000000001', 'Abril',    'Giménez',   '45000301', '2008-02-11', 6, 'A', 'Programación', 'abril.g@alumnos.test',   'Carla Giménez',   '11 6000-0301'),
+  ('30000000-0000-4000-8000-000000000302', '10000000-0000-4000-8000-000000000001', 'Mateo',    'Herrera',   '45000302', '2008-06-19', 6, 'A', 'Programación', 'mateo.h@alumnos.test',   'Luis Herrera',    '11 6000-0302'),
+  ('30000000-0000-4000-8000-000000000303', '10000000-0000-4000-8000-000000000001', 'Julieta',  'Navarro',   '45000303', '2009-01-08', 5, 'B', 'Electrónica',  'julieta.n@alumnos.test', 'Mara Navarro',    '11 6000-0303'),
+  ('30000000-0000-4000-8000-000000000304', '10000000-0000-4000-8000-000000000001', 'Benjamín', 'Acosta',    '45000304', '2008-10-25', 6, 'B', 'Programación', null,                     'Pablo Acosta',    '11 6000-0304'),
+  ('30000000-0000-4000-8000-000000000305', '10000000-0000-4000-8000-000000000001', 'Alma',     'Suárez',    '45000305', '2009-03-17', 5, 'A', 'Electrónica',  'alma.s@alumnos.test',    'Rocío Suárez',    '11 6000-0305'),
+  ('30000000-0000-4000-8000-000000000306', '10000000-0000-4000-8000-000000000002', 'Facundo',  'Molina',    '45000401', '2008-04-03', 5, 'U', 'Comunicación', 'facundo.m@alumnos.test', 'Nora Molina',     '351 600-0401'),
+  ('30000000-0000-4000-8000-000000000307', '10000000-0000-4000-8000-000000000002', 'Emilia',   'Castro',    '45000402', '2008-08-14', 5, 'U', 'Comunicación', 'emilia.c@alumnos.test',  'Juan Castro',     '351 600-0402'),
+  ('30000000-0000-4000-8000-000000000308', '10000000-0000-4000-8000-000000000002', 'Santino',  'Vega',      '45000403', '2009-02-22', 4, 'U', 'Economía y Administración', 'santino.v@alumnos.test', 'Eva Vega', '351 600-0403'),
+  ('30000000-0000-4000-8000-000000000309', '10000000-0000-4000-8000-000000000002', 'Delfina',  'Luna',      '45000404', '2008-11-06', 5, 'U', 'Comunicación', null,                     'Leo Luna',       '351 600-0404'),
+  ('30000000-0000-4000-8000-000000000310', '10000000-0000-4000-8000-000000000002', 'Bruno',    'Ibarra',    '45000405', '2009-05-29', 4, 'U', 'Economía y Administración', 'bruno.i@alumnos.test', 'Mía Ibarra', '351 600-0405'),
+  ('30000000-0000-4000-8000-000000000311', '10000000-0000-4000-8000-000000000001', 'Victoria', 'Pereyra',   '45000311', '2008-01-16', 6, 'A', 'Programación', 'victoria.p@alumnos.test', 'Andrea Pereyra', '11 6000-0311'),
+  ('30000000-0000-4000-8000-000000000312', '10000000-0000-4000-8000-000000000001', 'Lautaro',  'Correa',    '45000312', '2008-07-21', 6, 'B', 'Electrónica', 'lautaro.c@alumnos.test', 'Marcos Correa', '11 6000-0312'),
+  ('30000000-0000-4000-8000-000000000313', '10000000-0000-4000-8000-000000000001', 'Renata',   'Méndez',    '45000313', '2009-02-08', 5, 'A', 'Programación', 'renata.m@alumnos.test', 'Elena Méndez', '11 6000-0313');
 
 -- Convenios: cubren todos los estados del flujo
 insert into public.convenios (id, empresa_id, escuela_id, ciclo_lectivo, area, descripcion, cupos, fecha_inicio, fecha_fin, estado, respondido_en) values
   -- Pixel Andino → Río Claro: activo, con alumnos inscriptos
   ('40000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001',
-   2026, 'Desarrollo web', 'Pasantía en el equipo de frontend.', 3, '2026-08-01', '2026-11-30', 'activo', '2026-06-10'),
+   2026, 'Desarrollo web', 'Pasantía en el equipo de frontend.', 8, '2026-08-01', '2026-11-30', 'activo', '2026-06-10'),
   -- Cooperativa Norte → Río Claro: recién postulado, la escuela todavía no respondió
   ('40000000-0000-4000-8000-000000000002', '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001',
    2026, 'Soporte técnico', 'Mesa de ayuda y armado de equipos.', 2, '2026-09-01', '2026-12-15', 'postulado', null),
@@ -65,7 +85,10 @@ insert into public.convenios (id, empresa_id, escuela_id, ciclo_lectivo, area, d
    2026, 'Administración contable', 'Carga de comprobantes.', 1, null, null, 'rechazado', '2026-07-20'),
   -- Cooperativa Norte → Los Aromos: activo, con alumnos inscriptos
   ('40000000-0000-4000-8000-000000000005', '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000002',
-   2026, 'Comunicación institucional', 'Redes sociales y newsletter de la cooperativa.', 2, '2026-08-15', '2026-11-30', 'activo', '2026-07-01');
+   2026, 'Comunicación institucional', 'Redes sociales y newsletter de la cooperativa.', 7, '2026-08-15', '2026-11-30', 'activo', '2026-07-01'),
+  -- Grupo Delta → Río Claro: activo, permite mostrar un oferente adicional
+  ('40000000-0000-4000-8000-000000000006', '20000000-0000-4000-8000-000000000003', '10000000-0000-4000-8000-000000000001',
+   2026, 'Administración y gestión', 'Apoyo administrativo y facturación.', 5, '2026-09-01', '2026-12-15', 'activo', '2026-08-20');
 
 insert into public.requisitos (id, convenio_id, nombre, descripcion, tipo, obligatorio, orden) values
   -- Convenio 1 (Pixel Andino ↔ Río Claro)
@@ -86,7 +109,23 @@ insert into public.inscripciones (id, convenio_id, alumno_id, estado, fecha_inic
   ('60000000-0000-4000-8000-000000000002', '40000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000102', 'enviada',  null, null, null, 'Esperando respuesta de la empresa'),
   ('60000000-0000-4000-8000-000000000003', '40000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000103', 'borrador', null, null, null, 'Falta certificado médico'),
   ('60000000-0000-4000-8000-000000000004', '40000000-0000-4000-8000-000000000005', '30000000-0000-4000-8000-000000000201', 'en_curso', '2026-08-15', '2026-11-30', 90, null),
-  ('60000000-0000-4000-8000-000000000005', '40000000-0000-4000-8000-000000000005', '30000000-0000-4000-8000-000000000202', 'aceptada', '2026-11-01', '2026-11-30', 40, null);
+  ('60000000-0000-4000-8000-000000000005', '40000000-0000-4000-8000-000000000005', '30000000-0000-4000-8000-000000000202', 'aceptada', '2026-11-01', '2026-11-30', 40, null),
+  -- Cinco alumnos nuevos vinculados a Pixel Andino
+  ('60000000-0000-4000-8000-000000000006', '40000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000301', 'en_curso', '2026-08-01', '2026-11-30', 120, null),
+  ('60000000-0000-4000-8000-000000000007', '40000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000302', 'en_curso', '2026-08-01', '2026-11-30', 120, null),
+  ('60000000-0000-4000-8000-000000000008', '40000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000303', 'en_curso', '2026-08-01', '2026-11-30', 120, null),
+  ('60000000-0000-4000-8000-000000000009', '40000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000304', 'en_curso', '2026-08-01', '2026-11-30', 120, null),
+  ('60000000-0000-4000-8000-000000000010', '40000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000305', 'en_curso', '2026-08-01', '2026-11-30', 120, null),
+  -- Cinco alumnos nuevos vinculados a Cooperativa Norte
+  ('60000000-0000-4000-8000-000000000011', '40000000-0000-4000-8000-000000000005', '30000000-0000-4000-8000-000000000306', 'en_curso', '2026-08-15', '2026-11-30', 90, null),
+  ('60000000-0000-4000-8000-000000000012', '40000000-0000-4000-8000-000000000005', '30000000-0000-4000-8000-000000000307', 'en_curso', '2026-08-15', '2026-11-30', 90, null),
+  ('60000000-0000-4000-8000-000000000013', '40000000-0000-4000-8000-000000000005', '30000000-0000-4000-8000-000000000308', 'en_curso', '2026-08-15', '2026-11-30', 90, null),
+  ('60000000-0000-4000-8000-000000000014', '40000000-0000-4000-8000-000000000005', '30000000-0000-4000-8000-000000000309', 'en_curso', '2026-08-15', '2026-11-30', 90, null),
+  ('60000000-0000-4000-8000-000000000015', '40000000-0000-4000-8000-000000000005', '30000000-0000-4000-8000-000000000310', 'en_curso', '2026-08-15', '2026-11-30', 90, null),
+  -- Tres alumnos adicionales llegan a los 21 ficticios totales
+  ('60000000-0000-4000-8000-000000000016', '40000000-0000-4000-8000-000000000006', '30000000-0000-4000-8000-000000000311', 'en_curso', '2026-09-01', '2026-12-15', 100, null),
+  ('60000000-0000-4000-8000-000000000017', '40000000-0000-4000-8000-000000000006', '30000000-0000-4000-8000-000000000312', 'en_curso', '2026-09-01', '2026-12-15', 100, null),
+  ('60000000-0000-4000-8000-000000000018', '40000000-0000-4000-8000-000000000006', '30000000-0000-4000-8000-000000000313', 'aceptada', '2026-09-01', '2026-12-15', 80, null);
 
 -- convenio_id se completa solo (trigger) a partir de la inscripción
 insert into public.datos_inscripcion (inscripcion_id, requisito_id, valor, archivo_ruta) values
@@ -123,5 +162,10 @@ insert into public.seguimientos (inscripcion_id, fecha, progreso, observaciones,
 -- ---------------------------------------------------------------------
 -- update public.perfiles set rol = 'escuela_admin', escuela_id = '10000000-0000-4000-8000-000000000001' where email = 'rioclaro@test.com';
 -- update public.perfiles set rol = 'escuela_admin', escuela_id = '10000000-0000-4000-8000-000000000002' where email = 'losaromos@test.com';
+-- update public.perfiles set rol = 'escuela_tutor', escuela_id = '10000000-0000-4000-8000-000000000001' where email = 'tutor.rioclaro@test.com';
 -- update public.perfiles set rol = 'empresa_admin', empresa_id = '20000000-0000-4000-8000-000000000001' where email = 'pixel@test.com';
+-- update public.perfiles set rol = 'empresa_tutor', empresa_id = '20000000-0000-4000-8000-000000000001' where email = 'tutor.pixel@test.com';
 -- update public.perfiles set rol = 'empresa_admin', empresa_id = '20000000-0000-4000-8000-000000000002' where email = 'coopnorte@test.com';
+-- update public.perfiles set rol = 'empresa_admin', empresa_id = '20000000-0000-4000-8000-000000000003' where email = 'delta@test.com';
+--
+-- Todas las cuentas demo deben tener contraseña Sape2026 en Authentication -> Users.

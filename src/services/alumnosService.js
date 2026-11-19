@@ -13,7 +13,7 @@ export const ORDEN_ALUMNOS = {
 // Escuela: todos sus alumnos. Empresa: solo los que tienen una inscripción enviada en sus convenios (RLS).
 // activos: true | false | null (todos)
 export function listarAlumnos({ busqueda = '', curso = '', activos = true, orden = 'apellido' } = {}) {
-  let consulta = db().from('alumnos').select('*, inscripciones(count)')
+  let consulta = db().from('alumnos').select('*, inscripciones(id, convenio_id)')
   for (const [columna, ascending] of (ORDEN_ALUMNOS[orden] || ORDEN_ALUMNOS.apellido).columnas) {
     consulta = consulta.order(columna, { ascending, nullsFirst: false })
   }

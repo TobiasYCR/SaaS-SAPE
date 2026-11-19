@@ -5,6 +5,7 @@ import {
   textoBusqueda,
   validarAlumno,
   validarArchivo,
+  esContrasenaValida,
   validarConvenio,
   validarInscripcion,
   validarSeguimiento,
@@ -62,4 +63,11 @@ test('seguimientos e inscripciones validan rangos y fechas', () => {
 
 test('busqueda neutraliza caracteres de filtros PostgREST', () => {
   assert.equal(textoBusqueda('Ana,(*)%\\'), 'Ana')
+})
+
+test('contraseña exige exactamente ocho caracteres alfanuméricos', () => {
+  assert.equal(esContrasenaValida('Ab12cd34'), true)
+  assert.equal(esContrasenaValida('Ab12-cd3'), false)
+  assert.equal(esContrasenaValida('Ab123'), false)
+  assert.equal(esContrasenaValida('Ab123456'), true)
 })

@@ -48,7 +48,7 @@ end $$;
 create function pg_temp.id(c text) returns text language sql as $$ select valor from ids where clave = c $$;
 
 -- 1. Ingresa y carga el alumno (AlumnosView)
-select pg_temp.paso('01. Escuela ve sus alumnos activos',          'escuela.fp@sape.test', '4',     $q$select count(*) from alumnos where activo$q$);
+select pg_temp.paso('01. Escuela ve sus alumnos activos',          'escuela.fp@sape.test', '12',    $q$select count(*) from alumnos where activo$q$);
 select pg_temp.paso('02. Falta el DNI',                            'escuela.fp@sape.test', 'error', $q$insert into alumnos (escuela_id, nombre, apellido) values (mi_escuela(), 'Ana', 'Prueba')$q$);
 select pg_temp.paso('03. DNI con formato inválido',                'escuela.fp@sape.test', 'error', $q$insert into alumnos (escuela_id, nombre, apellido, dni) values (mi_escuela(), 'Ana', 'Prueba', '12.345')$q$);
 select pg_temp.paso('04. Curso fuera de rango',                    'escuela.fp@sape.test', 'error', $q$insert into alumnos (escuela_id, nombre, apellido, dni, curso) values (mi_escuela(), 'Ana', 'Prueba', '47000001', 9)$q$);

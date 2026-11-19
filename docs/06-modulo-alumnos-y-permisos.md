@@ -49,6 +49,18 @@ Usuario registrado sin organización: solo puede registrar su escuela o empresa.
 
 `supabase/tests/roles_alumnos.sql`, 45 casos con ROLLBACK.
 
+Resumen para los cuatro roles de SAPE. Los permisos se limitan a los registros de la organización y de los convenios en los que participa cada usuario.
+
+| Acción | `escuela_admin` | `escuela_tutor` | `empresa_admin` | `empresa_tutor` |
+|---|---|---|---|---|
+| Consultar | Sí: registros de su escuela | Sí: registros de su escuela | Sí: registros de su empresa y alumnos con inscripción no borrador | Sí: registros de sus convenios y alumnos con inscripción no borrador |
+| Crear | Sí: alumnos, inscripciones, requisitos y seguimientos | Sí: seguimientos | Sí: convenios, requisitos y seguimientos | Sí: seguimientos |
+| Modificar | Sí: registros de su escuela y estados permitidos | Solo sus propios seguimientos | Sí: registros de su empresa/convenios y estados permitidos | Solo sus propios seguimientos |
+| Eliminar / dar de baja | Sí, con límites: alumnos con historial se dan de baja; puede borrar inscripciones borrador | Solo sus propios seguimientos | Puede retirar postulaciones propias aún no respondidas y borrar requisitos del convenio | Solo sus propios seguimientos |
+| Gestionar usuarios | Sí: sumar miembros registrados a su escuela | No | Sí: sumar miembros registrados a su empresa | No |
+
+La baja de alumnos se implementa como `activo = false`; el borrado físico está limitado por las relaciones de historial. “Modificar” y “eliminar” también respetan las transiciones de estado y restricciones de cada registro. La gestión documentada permite sumar miembros; no ofrece una operación para eliminar miembros.
+
 | Acción | Admin escuela | Tutor escuela | Admin otra escuela | Admin empresa | Tutor empresa | Sin organización | Desactivado | Sin sesión |
 |---|---|---|---|---|---|---|---|---|
 | Ver alumnos de la escuela | ✅ 4 | ✅ 4 | ❌ 0 | Solo con inscripción enviada (2) | Solo con inscripción enviada (2) | ❌ 0 | ❌ 0 | ❌ error |

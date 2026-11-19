@@ -59,7 +59,7 @@ select case when count(*) = 0 then 'OK' else 'FALLA' end, 'base de datos', 'Usua
 from public.perfiles where rol is not null and escuela_id is null and empresa_id is null;
 
 -- ---------- Administrador de escuela: gestiona sus alumnos ----------
-select pg_temp.probar('admin.escuela@roles.test', 'Listar alumnos de su escuela',          '4',         $q$select count(*) from alumnos where activo$q$);
+select pg_temp.probar('admin.escuela@roles.test', 'Listar alumnos de su escuela',          '12',        $q$select count(*) from alumnos where activo$q$);
 select pg_temp.probar('admin.escuela@roles.test', 'Buscar por apellido (ilike)',           '1',         $q$select count(*) from alumnos where apellido ilike '%ríos%'$q$);
 select pg_temp.probar('admin.escuela@roles.test', 'Ordenar por curso',                     'permitido', $q$select string_agg(dni, ',' order by curso, division, apellido) from alumnos$q$);
 select pg_temp.probar('admin.escuela@roles.test', 'Crear alumno',                          'permitido', $q$with a as (insert into alumnos (escuela_id, nombre, apellido, dni, curso) values (mi_escuela(), 'Nuevo', 'Alumno', '48000001', 5) returning id) select id from a$q$, 'nuevo');
@@ -82,7 +82,7 @@ select pg_temp.probar('admin.escuela@roles.test', 'Cambiarse el rol',           
 select pg_temp.probar('admin.escuela@roles.test', 'Pasarse a otra organización',           'bloqueado', $q$with u as (update perfiles set escuela_id = '10000000-0000-4000-8000-000000000002' where id = auth.uid() returning 1) select count(*) from u$q$);
 
 -- ---------- Tutor de escuela: consulta ----------
-select pg_temp.probar('tutor.escuela@roles.test', 'Listar alumnos de su escuela',          '4',         $q$select count(*) from alumnos where activo$q$);
+select pg_temp.probar('tutor.escuela@roles.test', 'Listar alumnos de su escuela',          '12',        $q$select count(*) from alumnos where activo$q$);
 select pg_temp.probar('tutor.escuela@roles.test', 'Crear alumno',                          'bloqueado', $q$insert into alumnos (escuela_id, nombre, apellido, dni) values (mi_escuela(), 'X', 'Y', '48000003') returning 1$q$);
 select pg_temp.probar('tutor.escuela@roles.test', 'Modificar alumno',                      'bloqueado', $q$with u as (update alumnos set nombre = 'X' where dni = '45000102' returning 1) select count(*) from u$q$);
 select pg_temp.probar('tutor.escuela@roles.test', 'Dar de baja',                           'bloqueado', $q$with u as (update alumnos set activo = false where dni = '45000102' returning 1) select count(*) from u$q$);
@@ -90,20 +90,20 @@ select pg_temp.probar('tutor.escuela@roles.test', 'Eliminar alumno',            
 select pg_temp.probar('tutor.escuela@roles.test', 'Sumar miembros',                        'bloqueado', $q$select asignar_miembro('sin.org@roles.test', 'escuela_tutor')$q$);
 
 -- ---------- Administrador de otra escuela ----------
-select pg_temp.probar('admin.otra@roles.test',    'Listar: solo los de su escuela',        '4',         $q$select count(*) from alumnos$q$);
+select pg_temp.probar('admin.otra@roles.test',    'Listar: solo los de su escuela',        '9',         $q$select count(*) from alumnos$q$);
 select pg_temp.probar('admin.otra@roles.test',    'Ver alumnos de Río Claro',              '0',         $q$select count(*) from alumnos where escuela_id = '10000000-0000-4000-8000-000000000001'$q$);
 select pg_temp.probar('admin.otra@roles.test',    'Modificar alumno de Río Claro',         'bloqueado', $q$with u as (update alumnos set nombre = 'X' where dni = '45000102' returning 1) select count(*) from u$q$);
 select pg_temp.probar('admin.otra@roles.test',    'Eliminar alumno de Río Claro',          'bloqueado', $q$with d as (delete from alumnos where dni = '45000104' returning 1) select count(*) from d$q$);
 
 -- ---------- Administrador de empresa ----------
-select pg_temp.probar('admin.empresa@roles.test', 'Ver alumnos con inscripción enviada',   '2',         $q$select count(*) from alumnos$q$);
+select pg_temp.probar('admin.empresa@roles.test', 'Ver alumnos con inscripción enviada',   '7',         $q$select count(*) from alumnos$q$);
 select pg_temp.probar('admin.empresa@roles.test', 'Ver alumno en borrador (Lucía)',        '0',         $q$select count(*) from alumnos where dni = '45000103'$q$);
 select pg_temp.probar('admin.empresa@roles.test', 'Crear alumno',                          'bloqueado', $q$insert into alumnos (escuela_id, nombre, apellido, dni) values ('10000000-0000-4000-8000-000000000001', 'X', 'Y', '48000004') returning 1$q$);
 select pg_temp.probar('admin.empresa@roles.test', 'Modificar alumno',                      'bloqueado', $q$with u as (update alumnos set nombre = 'X' where dni = '45000101' returning 1) select count(*) from u$q$);
 select pg_temp.probar('admin.empresa@roles.test', 'Eliminar alumno',                       'bloqueado', $q$with d as (delete from alumnos where dni = '45000101' returning 1) select count(*) from d$q$);
 
 -- ---------- Tutor de empresa ----------
-select pg_temp.probar('tutor.empresa@roles.test', 'Ver alumnos con inscripción enviada',   '2',         $q$select count(*) from alumnos$q$);
+select pg_temp.probar('tutor.empresa@roles.test', 'Ver alumnos con inscripción enviada',   '7',         $q$select count(*) from alumnos$q$);
 select pg_temp.probar('tutor.empresa@roles.test', 'Modificar alumno',                      'bloqueado', $q$with u as (update alumnos set nombre = 'X' where dni = '45000101' returning 1) select count(*) from u$q$);
 
 -- ---------- Usuario sin organización, desactivado y sin sesión ----------

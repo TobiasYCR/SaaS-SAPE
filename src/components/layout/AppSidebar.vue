@@ -5,9 +5,6 @@ import { cuentaDesactivada, currentUser, errorPerfil, ETIQUETA_ROL, organizacion
 import { supabase } from '../../services/supabase'
 import DatosPruebaBadge from '../common/DatosPruebaBadge.vue'
 
-defineProps({ open: { type: Boolean, default: false } })
-const emit = defineEmits(['navigate'])
-
 const router = useRouter()
 const signOutError = ref('')
 
@@ -18,6 +15,8 @@ const ITEMS = [
   { label: 'Empresas', to: '/empresas', icon: '▦' },
   { label: 'Alumnos', to: '/alumnos', icon: '♙', tipo: 'escuela' },
   { label: 'Convenios', to: '/convenios', icon: '▤' },
+  { label: 'Planes', to: '/planes', icon: '▧' },
+  { label: 'Oferentes', to: '/oferentes', icon: '◇', tipo: 'escuela' },
   { label: 'Inscripciones', to: '/inscripciones', icon: '✓' },
   { label: 'Seguimientos', to: '/seguimientos', icon: '◷' },
   { label: 'Mi organización', to: '/organizacion', icon: '⚙' },
@@ -54,9 +53,9 @@ async function signOut() {
 </script>
 
 <template>
-  <aside class="sidebar" :class="{ 'sidebar--open': open }">
+  <aside class="sidebar">
     <div class="brand">
-      <div class="brand-mark">S</div>
+      <img class="brand-logo" src="/logo-sape.png" alt="SAPE Pasantías" />
       <div>
         <strong>SAPE</strong>
         <span>Pasantías escolares</span>
@@ -74,7 +73,7 @@ async function signOut() {
 
     <p class="nav-label">{{ organizacion?.tipo === 'empresa' ? 'EMPRESA' : 'VIDA ESCOLAR' }}</p>
     <nav class="main-nav" aria-label="Navegación principal">
-      <RouterLink v-for="item in navigation" :key="item.to" :to="item.to" @click="emit('navigate')">
+      <RouterLink v-for="item in navigation" :key="item.to" :to="item.to">
         <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>{{ item.label }}
       </RouterLink>
     </nav>
@@ -83,7 +82,7 @@ async function signOut() {
       <div class="user-row"><div class="avatar">{{ initials(userName) }}</div><div class="user-details"><strong>{{ userName }}</strong><span>{{ currentUser?.email }}</span></div></div>
       <p v-if="signOutError" class="sidebar-error" role="alert">{{ signOutError }}</p>
       <div class="account-actions">
-        <RouterLink to="/change-password" @click="emit('navigate')">Cambiar contraseña</RouterLink>
+        <RouterLink to="/change-password">Cambiar contraseña</RouterLink>
         <button type="button" @click="signOut">Cerrar sesión</button>
       </div>
     </div>

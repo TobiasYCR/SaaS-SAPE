@@ -3,7 +3,6 @@ import { computed, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import AppSidebar from './components/layout/AppSidebar.vue'
 import AppTopbar from './components/layout/AppTopbar.vue'
-import AvisoDatosPrueba from './components/common/AvisoDatosPrueba.vue'
 import { cargandoPerfil, cuentaDesactivada, currentUser, errorPerfil, recargarPerfil } from './composables/useAuth'
 
 const route = useRoute()
@@ -36,7 +35,7 @@ const pageTitle = computed(() => route.meta.titulo || 'SAPE')
         <p v-if="cuentaDesactivada" class="aviso aviso--error" role="alert">
           Tu cuenta está desactivada. Pedile al administrador de tu organización que la vuelva a habilitar.
         </p>
-        <template v-else><AvisoDatosPrueba /><RouterView :key="route.fullPath" /></template>
+        <template v-else><RouterView :key="route.fullPath" /></template>
       </div>
     </main>
   </div>

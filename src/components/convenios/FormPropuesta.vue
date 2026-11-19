@@ -11,6 +11,18 @@ defineProps({
 
 <template>
   <div class="form-grid">
+    <CampoFormulario etiqueta="Número de plan">
+      <input v-model="datos.numero_plan" maxlength="30" placeholder="Ej. 108767" />
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Fecha de carga">
+      <input v-model="datos.fecha_carga" type="date" />
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Tipo de plan">
+      <select v-model="datos.tipo_plan"><option value="">PPE</option><option>PP</option><option>PPE</option><option>Institucional</option></select>
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Visado">
+      <select v-model="datos.visto"><option :value="false">No</option><option :value="true">Sí</option></select>
+    </CampoFormulario>
     <CampoFormulario etiqueta="Área o puesto" :error="errores.area" obligatorio>
       <input v-model="datos.area" maxlength="120" placeholder="Desarrollo web" />
     </CampoFormulario>

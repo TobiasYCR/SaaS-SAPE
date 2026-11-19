@@ -15,8 +15,8 @@ export function obtenerEscuela(id) {
 }
 
 // Solo el escuela_admin de esa escuela (RLS)
-export function actualizarEscuela(id, { nombre, cue, modalidad, especialidades, descripcion, direccion, localidad, provincia, email, telefono }) {
+export function actualizarEscuela(id, datos) {
   return ejecutar(db().from('escuelas')
-    .update({ nombre, cue, modalidad, especialidades, descripcion, direccion, localidad, provincia, email, telefono })
+    .update(datos)
     .eq('id', id).select().single())
 }

@@ -10,6 +10,9 @@ defineProps({ errores: { type: Object, default: () => ({}) } })
   <div class="form-grid form-grid--3">
     <CampoFormulario etiqueta="Apellido" :error="errores.apellido" obligatorio><input v-model="datos.apellido" maxlength="80" autocomplete="off" /></CampoFormulario>
     <CampoFormulario etiqueta="Nombre" :error="errores.nombre" obligatorio><input v-model="datos.nombre" maxlength="80" autocomplete="off" /></CampoFormulario>
+    <CampoFormulario etiqueta="Tipo de documento" :error="errores.tipo_documento" obligatorio>
+      <select v-model="datos.tipo_documento"><option>DNI</option><option>LC</option><option>LE</option><option>Pasaporte</option><option>Otro</option></select>
+    </CampoFormulario>
     <CampoFormulario etiqueta="DNI" :error="errores.dni" ayuda="Sin puntos" obligatorio><input v-model="datos.dni" inputmode="numeric" maxlength="8" /></CampoFormulario>
     <CampoFormulario etiqueta="Fecha de nacimiento" :error="errores.fecha_nacimiento"><input v-model="datos.fecha_nacimiento" type="date" /></CampoFormulario>
     <CampoFormulario etiqueta="Curso" :error="errores.curso">

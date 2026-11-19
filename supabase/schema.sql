@@ -36,6 +36,14 @@ create table public.escuelas (
   id              uuid primary key default gen_random_uuid(),
   nombre          text not null check (length(trim(nombre)) > 0),
   cue             text not null unique check (cue ~ '^[0-9]{9}$'),
+  numero_escuela  text,
+  departamento    text,
+  distrito        text,
+  codigo_postal   text,
+  anio_inicio     smallint check (anio_inicio between 1800 and 2100),
+  ambito          text,
+  gestion         text,
+  director        text,
   modalidad       text,
   especialidades  text[] not null default '{}',
   descripcion     text,
@@ -44,6 +52,7 @@ create table public.escuelas (
   provincia       text not null,
   email           text check (email ~* '^[^@\s]+@[^@\s]+\.[^@\s]+$'),
   telefono        text,
+  sitio_web       text,
   logo_url        text,
   logo_ruta       text,
   activa          boolean not null default true,
@@ -59,6 +68,10 @@ create table public.empresas (
   nombre_fantasia  text,
   cuit             text not null unique check (cuit ~ '^[0-9]{11}$'),
   rubro            text,
+  referente_nombre text,
+  referente_cargo  text,
+  referente_email  text,
+  referente_telefono text,
   descripcion      text,
   direccion        text,
   localidad        text not null,
@@ -100,6 +113,7 @@ create table public.alumnos (
   escuela_id            uuid not null references public.escuelas(id) on delete cascade,
   nombre                text not null,
   apellido              text not null,
+  tipo_documento        text not null default 'DNI',
   dni                   text not null check (dni ~ '^[0-9]{7,8}$'),
   fecha_nacimiento      date,
   curso                 smallint check (curso between 1 and 7),
@@ -121,6 +135,11 @@ create table public.convenios (
   id              uuid primary key default gen_random_uuid(),
   empresa_id      uuid not null references public.empresas(id) on delete cascade,
   escuela_id      uuid not null references public.escuelas(id) on delete cascade,
+  numero_plan     text,
+  fecha_carga     date,
+  tipo_plan       text,
+  visto           boolean not null default false,
+  disposicion     text,
   ciclo_lectivo   smallint not null check (ciclo_lectivo between 2020 and 2100),
   area            text,
   descripcion     text,
@@ -195,6 +214,20 @@ create table public.datos_inscripcion (
   unique (inscripcion_id, requisito_id)
 );
 create index datos_inscripcion_requisito_idx on public.datos_inscripcion (requisito_id);
+
+-- Archivos asociados a un plan/convenio (disposiciones y anexos)
+create table public.documentos_plan (
+  id              uuid primary key default gen_random_uuid(),
+  convenio_id     uuid not null references public.convenios(id) on delete cascade,
+  nombre          text not null,
+  descripcion     text,
+  ruta            text not null,
+  tipo_mime       text,
+  tamano          bigint check (tamano >= 0),
+  cargado_por     uuid default auth.uid() references public.perfiles(id) on delete set null,
+  creado_en       timestamptz not null default now()
+);
+create index documentos_plan_convenio_idx on public.documentos_plan (convenio_id);
 
 -- Seguimiento periódico de una pasantía en curso
 create table public.seguimientos (
@@ -487,17 +520,21 @@ begin
 
   if p_tipo = 'escuela' then
     insert into public.escuelas (nombre, cue, modalidad, especialidades, descripcion, direccion,
-                                 localidad, provincia, email, telefono)
+                                 localidad, provincia, email, telefono, numero_escuela, departamento,
+                                 distrito, codigo_postal, anio_inicio, ambito, gestion, director, sitio_web)
     select nombre, cue, modalidad, coalesce(especialidades, '{}'), descripcion, direccion,
-           localidad, provincia, email, telefono
+           localidad, provincia, email, telefono, numero_escuela, departamento,
+           distrito, codigo_postal, anio_inicio, ambito, gestion, director, sitio_web
     from jsonb_populate_record(null::public.escuelas, p_datos)
     returning id into v_id;
     update public.perfiles set rol = 'escuela_admin', escuela_id = v_id where id = auth.uid();
   elsif p_tipo = 'empresa' then
     insert into public.empresas (razon_social, nombre_fantasia, cuit, rubro, descripcion, direccion,
-                                 localidad, provincia, email, telefono, sitio_web)
+                                 localidad, provincia, email, telefono, sitio_web,
+                                 referente_nombre, referente_cargo, referente_email, referente_telefono)
     select razon_social, nombre_fantasia, cuit, rubro, descripcion, direccion,
-           localidad, provincia, email, telefono, sitio_web
+           localidad, provincia, email, telefono, sitio_web,
+           referente_nombre, referente_cargo, referente_email, referente_telefono
     from jsonb_populate_record(null::public.empresas, p_datos)
     returning id into v_id;
     update public.perfiles set rol = 'empresa_admin', empresa_id = v_id where id = auth.uid();
@@ -529,41 +566,6 @@ begin
   end if;
 end $$;
 
--- El admin cambia el rol o habilita/deshabilita a un miembro de su organizacion.
--- No se elimina el perfil para conservar la autoria y el historial.
-create function public.actualizar_miembro(
-  p_usuario uuid,
-  p_rol public.rol_usuario,
-  p_activo boolean
-) returns void
-language plpgsql security definer set search_path = '' as $$
-declare
-  v_rol public.rol_usuario := public.mi_rol();
-begin
-  if auth.uid() is null then raise exception 'Sesion requerida'; end if;
-  if p_usuario = auth.uid() then raise exception 'No podes modificar tu propia cuenta'; end if;
-
-  if v_rol = 'escuela_admin' and p_rol in ('escuela_admin', 'escuela_tutor') then
-    update public.perfiles
-       set rol = p_rol, activo = p_activo
-     where id = p_usuario
-       and escuela_id = public.mi_escuela()
-       and empresa_id is null;
-  elsif v_rol = 'empresa_admin' and p_rol in ('empresa_admin', 'empresa_tutor') then
-    update public.perfiles
-       set rol = p_rol, activo = p_activo
-     where id = p_usuario
-       and empresa_id = public.mi_empresa()
-       and escuela_id is null;
-  else
-    raise exception 'No tenes permiso para asignar el rol %', p_rol;
-  end if;
-
-  if not found then
-    raise exception 'El usuario no pertenece a tu organizacion';
-  end if;
-end $$;
-
 -- ---------------------------------------------------------------------
 -- 6. Permisos y Row Level Security
 -- ---------------------------------------------------------------------
@@ -579,7 +581,8 @@ from public, anon, authenticated;
 
 grant select, insert, update, delete on
   public.escuelas, public.empresas, public.alumnos, public.convenios,
-  public.requisitos, public.inscripciones, public.datos_inscripcion, public.seguimientos
+  public.requisitos, public.inscripciones, public.datos_inscripcion, public.seguimientos,
+  public.documentos_plan
 to authenticated;
 
 -- perfiles: el usuario solo edita sus datos personales (rol y organización vía RPC)
@@ -596,6 +599,7 @@ alter table public.requisitos        enable row level security;
 alter table public.inscripciones     enable row level security;
 alter table public.datos_inscripcion enable row level security;
 alter table public.seguimientos      enable row level security;
+alter table public.documentos_plan   enable row level security;
 
 -- Directorio mutuo: escuelas y empresas se ven entre sí
 create policy "directorio de escuelas" on public.escuelas
@@ -737,6 +741,16 @@ create policy "autor edita su seguimiento" on public.seguimientos
 create policy "autor elimina su seguimiento" on public.seguimientos
   for delete to authenticated using (autor_id = (select auth.uid()));
 
+-- Archivos y metadatos de planes: solo pueden verlos las partes del convenio
+create policy "partes ven documentos de plan" on public.documentos_plan
+  for select to authenticated using ((select public.es_parte_convenio(convenio_id)));
+create policy "partes cargan documentos de plan" on public.documentos_plan
+  for insert to authenticated with check (
+    cargado_por = (select auth.uid()) and (select public.es_parte_convenio(convenio_id))
+  );
+create policy "autor elimina documento de plan" on public.documentos_plan
+  for delete to authenticated using (cargado_por = (select auth.uid()));
+
 -- ---------------------------------------------------------------------
 -- 7. Storage
 --   logos       (público): {id_organizacion}/archivo
@@ -765,11 +779,7 @@ create policy "admin elimina logo de su organizacion" on storage.objects
 create policy "partes ven documentos del convenio" on storage.objects
   for select to authenticated using (
     bucket_id = 'documentos'
-    and exists (
-      select 1 from public.convenios c
-      where c.id::text = (storage.foldername(name))[1]
-        and (c.escuela_id = (select public.mi_escuela()) or c.empresa_id = (select public.mi_empresa()))
-    )
+    and exists (select 1 from public.convenios c where c.id::text = (storage.foldername(name))[1])
   );
 create policy "escuela sube documentos" on storage.objects
   for insert to authenticated with check (
