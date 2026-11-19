@@ -4,6 +4,8 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { authError } from '../composables/useAuth'
 import { supabase } from '../services/supabase'
+import CampoContrasena from '../components/common/CampoContrasena.vue'
+import { esContrasenaValida } from '../utils/validaciones'
 
 const route = useRoute()
 const router = useRouter()
@@ -16,6 +18,24 @@ const errorMessage = ref('')
 // Viene de una sesión cerrada o vencida (App.vue)
 const notice = ref(route.query.motivo === 'sesion' ? 'Tu sesión se cerró. Iniciá sesión para continuar.' : '')
 const isSubmitting = ref(false)
+const cuentaDemoAbierta = ref(false)
+
+const CUENTAS_DEMO = [
+  { email: 'rioclaro@test.com', rol: 'Admin escuela', organizacion: 'Escuela Técnica Río Claro' },
+  { email: 'tutor.rioclaro@test.com', rol: 'Tutor escuela', organizacion: 'Escuela Técnica Río Claro' },
+  { email: 'pixel@test.com', rol: 'Admin empresa', organizacion: 'Pixel Andino S.R.L.' },
+  { email: 'tutor.pixel@test.com', rol: 'Tutor empresa', organizacion: 'Pixel Andino S.R.L.' },
+  { email: 'coopnorte@test.com', rol: 'Admin empresa', organizacion: 'Cooperativa Norte Ltda.' },
+  { email: 'delta@test.com', rol: 'Admin empresa', organizacion: 'Grupo Delta S.A.' },
+]
+
+function usarCuentaDemo(cuenta) {
+  email.value = cuenta.email
+  password.value = 'Sape2026'
+  confirmPassword.value = ''
+  errorMessage.value = ''
+  cuentaDemoAbierta.value = false
+}
 
 const title = computed(() => isRegistering.value ? 'Crea tu cuenta' : 'Bienvenido de nuevo')
 const submitLabel = computed(() => {
@@ -42,6 +62,10 @@ async function submitAuth() {
 
   if (isRegistering.value && password.value !== confirmPassword.value) {
     errorMessage.value = 'Las contraseñas no coinciden.'
+    return
+  }
+  if (isRegistering.value && !esContrasenaValida(password.value)) {
+    errorMessage.value = 'La contraseña debe tener exactamente 8 caracteres alfanuméricos.'
     return
   }
 
@@ -94,7 +118,7 @@ function safeRedirectPath() {
     <div class="auth-layout">
       <aside class="auth-story">
         <RouterLink class="auth-brand" to="/login" aria-label="SAPE, ir al inicio">
-          <span class="brand-mark">S</span>
+          <img class="brand-logo" src="/logo-sape.png" alt="SAPE Pasantías" />
           <span><strong>SAPE</strong><small>Pasantías escolares</small></span>
         </RouterLink>
 
@@ -149,28 +173,19 @@ function safeRedirectPath() {
             required
           >
 
-          <label for="password">Contraseña</label>
-          <input
-            id="password"
+          <CampoContrasena
             v-model="password"
-            type="password"
+            etiqueta="Contraseña"
             :autocomplete="isRegistering ? 'new-password' : 'current-password'"
-            placeholder="Mínimo 8 caracteres"
-            minlength="8"
-            required
-          >
+          />
 
           <template v-if="isRegistering">
-            <label for="confirm-password">Confirmar contraseña</label>
-            <input
-              id="confirm-password"
+            <CampoContrasena
               v-model="confirmPassword"
-              type="password"
+              etiqueta="Confirmar contraseña"
+              placeholder="Repite la contraseña"
               autocomplete="new-password"
-              placeholder="Repite tu contraseña"
-              minlength="8"
-              required
-            >
+            />
           </template>
 
           <p v-if="errorMessage || authError" class="auth-message auth-message--error" role="alert">
@@ -181,6 +196,19 @@ function safeRedirectPath() {
           <button class="primary-button auth-submit" type="submit" :disabled="isSubmitting">
             {{ submitLabel }}
           </button>
+
+          <div v-if="!isRegistering" class="cuentas-demo">
+            <button type="button" class="cuentas-demo__toggle" @click="cuentaDemoAbierta = !cuentaDemoAbierta">
+              Cuentas de demostración por rol {{ cuentaDemoAbierta ? '▲' : '▼' }}
+            </button>
+            <div v-if="cuentaDemoAbierta" class="cuentas-demo__lista">
+              <button v-for="cuenta in CUENTAS_DEMO" :key="cuenta.email" type="button" @click="usarCuentaDemo(cuenta)">
+                <strong>{{ cuenta.rol }}</strong>
+                <span>{{ cuenta.organizacion }}</span>
+                <small>{{ cuenta.email }} · Sape2026</small>
+              </button>
+            </div>
+          </div>
         </form>
 
         <p class="auth-switch">

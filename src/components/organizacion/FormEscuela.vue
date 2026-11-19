@@ -14,6 +14,30 @@ defineProps({ errores: { type: Object, default: () => ({}) } })
     <CampoFormulario etiqueta="CUE" :error="errores.cue" ayuda="9 dígitos, sin guiones" obligatorio>
       <input v-model="datos.cue" inputmode="numeric" maxlength="9" placeholder="060000101" />
     </CampoFormulario>
+    <CampoFormulario etiqueta="Número / establecimiento" :error="errores.numero_escuela">
+      <input v-model="datos.numero_escuela" maxlength="30" />
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Departamento" :error="errores.departamento">
+      <input v-model="datos.departamento" maxlength="100" />
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Distrito" :error="errores.distrito">
+      <input v-model="datos.distrito" maxlength="100" />
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Código postal" :error="errores.codigo_postal">
+      <input v-model="datos.codigo_postal" maxlength="12" />
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Año de inicio" :error="errores.anio_inicio">
+      <input v-model="datos.anio_inicio" type="number" min="1800" max="2100" />
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Ámbito" :error="errores.ambito">
+      <select v-model="datos.ambito"><option value="">Sin especificar</option><option>Urbano</option><option>Rural</option></select>
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Gestión" :error="errores.gestion">
+      <select v-model="datos.gestion"><option value="">Sin especificar</option><option>Pública</option><option>Privada</option></select>
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Director / autoridad" :error="errores.director">
+      <input v-model="datos.director" maxlength="150" />
+    </CampoFormulario>
     <CampoFormulario etiqueta="Modalidad" :error="errores.modalidad">
       <select v-model="datos.modalidad">
         <option value="">Sin especificar</option>

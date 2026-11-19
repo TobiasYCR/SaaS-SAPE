@@ -16,8 +16,8 @@ export function obtenerEmpresa(id) {
 }
 
 // Solo el empresa_admin de esa empresa (RLS)
-export function actualizarEmpresa(id, { razon_social, nombre_fantasia, cuit, rubro, descripcion, direccion, localidad, provincia, email, telefono, sitio_web }) {
+export function actualizarEmpresa(id, datos) {
   return ejecutar(db().from('empresas')
-    .update({ razon_social, nombre_fantasia, cuit, rubro, descripcion, direccion, localidad, provincia, email, telefono, sitio_web })
+    .update(datos)
     .eq('id', id).select().single())
 }

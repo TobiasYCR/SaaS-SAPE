@@ -6,6 +6,8 @@ import { hoy } from './catalogos.js'
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 const vacio = (v) => v === null || v === undefined || String(v).trim() === ''
 
+export const esContrasenaValida = (valor) => /^[A-Za-z0-9]{8}$/.test(valor)
+
 export function requeridos(datos, campos) {
   const errores = {}
   for (const [campo, etiqueta] of Object.entries(campos)) {
@@ -60,19 +62,20 @@ export function validarRequisito(d) {
   return requeridos(d, { nombre: 'El nombre', tipo: 'El tipo' })
 }
 
+export function validarArchivo(archivo) {
+  if (!archivo) return 'Seleccioná un archivo.'
+  const permitido = ['application/pdf', 'image/jpeg', 'image/png']
+  if (!permitido.includes(archivo.type)) return 'Solo PDF, JPG o PNG.'
+  if (archivo.size > 10 * 1024 * 1024) return 'El archivo no puede superar los 10 MB.'
+  return ''
+}
+
 // Valor de un requisito según su tipo (mismo criterio que el trigger validar_dato_inscripcion)
 export function validarValorRequisito(tipo, valor) {
   if (vacio(valor)) return ''
   if (tipo === 'numero' && !/^-?\d+([.,]\d+)?$/.test(valor)) return 'Debe ser un número.'
   if (tipo === 'si_no' && !['si', 'no'].includes(valor)) return 'Elegí sí o no.'
   if (tipo === 'fecha' && Number.isNaN(Date.parse(valor))) return 'Fecha inválida.'
-  return ''
-}
-
-export function validarArchivo(archivo) {
-  if (!archivo) return ''
-  if (!['application/pdf', 'image/jpeg', 'image/png'].includes(archivo.type)) return 'Solo PDF, JPG o PNG.'
-  if (archivo.size > 10 * 1024 * 1024) return 'El archivo no puede superar los 10 MB.'
   return ''
 }
 

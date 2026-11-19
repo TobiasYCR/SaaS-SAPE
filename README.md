@@ -20,10 +20,20 @@ Stack: Vue 3 + Vite + Vue Router + Supabase (Auth, PostgreSQL, Storage).
    npm run dev
    ```
 
+## Publicación
+
+- **Vercel:** importar el repositorio; el build es `npm run build` y el directorio público es `dist`. `vercel.json` conserva las rutas internas de Vue.
+- **Netlify:** usar `netlify.toml`; el redirect incluido entrega `index.html` para rutas internas.
+- Configurar `VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY` como variables del entorno de despliegue.
+- En Supabase Authentication → URL Configuration, agregar la URL pública como Site URL y como Redirect URL.
+- Ejecutar también `supabase/migraciones/006_planes_estudiantes_institucion.sql` en proyectos creados antes de esta actualización.
+
 ## Usuarios de prueba
 
-1. Registrar cuentas desde la pantalla de login.
-2. Para usar las organizaciones ficticias del seed, vincular cada cuenta en el SQL Editor (líneas comentadas al final de `supabase/seed.sql`).
+La pantalla de login incluye **Cuentas de demostración por rol** y completa el email y la contraseña `Sape2026`.
+
+1. Crear las cuentas en Supabase Authentication.
+2. Vincularlas a las organizaciones ficticias con las instrucciones comentadas al final de `supabase/seed.sql`.
 3. Una cuenta sin vincular entra a **Registrar organización** y crea su propia escuela o empresa.
 
 ## Pruebas

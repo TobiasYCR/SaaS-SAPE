@@ -53,9 +53,9 @@ begin
 end $$;
 
 -- Usuarios: 1 Río Claro · 2 Los Aromos · 3 Pixel Andino · 4 Coop Norte · 5 sin organización
-select pg_temp.probar('Río Claro ve solo sus 4 alumnos',                 '1', '4', 'select count(*) from alumnos');
+select pg_temp.probar('Río Claro ve solo sus 12 alumnos',                '1', '12', 'select count(*) from alumnos');
 select pg_temp.probar('Río Claro ve el directorio de 3 empresas',        '1', '3', 'select count(*) from empresas');
-select pg_temp.probar('Río Claro ve solo sus 2 convenios',               '1', '2', 'select count(*) from convenios');
+select pg_temp.probar('Río Claro ve solo sus 3 convenios',               '1', '3', 'select count(*) from convenios');
 select pg_temp.probar('Los Aromos no ve alumnos de Río Claro',           '2', '0', $q$select count(*) from alumnos where escuela_id = '10000000-0000-4000-8000-000000000001'$q$);
 select pg_temp.probar('Pixel ve el directorio de 2 escuelas',            '3', '2', 'select count(*) from escuelas');
 select pg_temp.probar('Pixel ve solo los 2 alumnos con inscripción enviada', '3', '2', 'select count(*) from alumnos');

@@ -39,7 +39,10 @@ async function cargar() {
 
 function abrirPostulacion(escuela) {
   seleccionada.value = escuela
-  propuesta.value = { area: '', descripcion: '', cupos: 1, ciclo_lectivo: anioActual(), fecha_inicio: '', fecha_fin: '' }
+  propuesta.value = {
+    area: '', descripcion: '', cupos: 1, ciclo_lectivo: anioActual(), fecha_inicio: '', fecha_fin: '',
+    numero_plan: '', fecha_carga: '', tipo_plan: 'PPE', visto: false,
+  }
   errores.value = {}
   postulacion.limpiar()
 }

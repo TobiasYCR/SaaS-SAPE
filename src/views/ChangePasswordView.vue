@@ -2,6 +2,8 @@
 import { traducirError } from '../utils/errores'
 import { ref } from 'vue'
 import { supabase } from '../services/supabase'
+import CampoContrasena from '../components/common/CampoContrasena.vue'
+import { esContrasenaValida } from '../utils/validaciones'
 
 const password = ref('')
 const confirmPassword = ref('')
@@ -15,6 +17,10 @@ async function updatePassword() {
 
   if (password.value !== confirmPassword.value) {
     errorMessage.value = 'Las contraseñas no coinciden.'
+    return
+  }
+  if (!esContrasenaValida(password.value)) {
+    errorMessage.value = 'La contraseña debe tener exactamente 8 caracteres alfanuméricos.'
     return
   }
 
@@ -47,27 +53,8 @@ async function updatePassword() {
   </section>
 
   <form class="panel password-panel" @submit.prevent="updatePassword">
-    <label for="new-password">Nueva contraseña</label>
-    <input
-      id="new-password"
-      v-model="password"
-      type="password"
-      autocomplete="new-password"
-      minlength="8"
-      placeholder="Mínimo 8 caracteres"
-      required
-    >
-
-    <label for="confirm-new-password">Confirmar contraseña</label>
-    <input
-      id="confirm-new-password"
-      v-model="confirmPassword"
-      type="password"
-      autocomplete="new-password"
-      minlength="8"
-      placeholder="Escribe nuevamente tu contraseña"
-      required
-    >
+    <CampoContrasena v-model="password" etiqueta="Nueva contraseña" placeholder="8 letras o números" autocomplete="new-password" />
+    <CampoContrasena v-model="confirmPassword" etiqueta="Confirmar contraseña" placeholder="Repite la contraseña" autocomplete="new-password" />
 
     <p v-if="errorMessage" class="auth-message auth-message--error" role="alert">{{ errorMessage }}</p>
     <p v-if="notice" class="auth-message auth-message--success" role="status">{{ notice }}</p>

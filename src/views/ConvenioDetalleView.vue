@@ -80,7 +80,11 @@ async function retirar() {
 
 function editarPropuesta() {
   const c = convenio.value
-  propuesta.value = { area: c.area ?? '', descripcion: c.descripcion ?? '', cupos: c.cupos, ciclo_lectivo: c.ciclo_lectivo, fecha_inicio: c.fecha_inicio ?? '', fecha_fin: c.fecha_fin ?? '' }
+  propuesta.value = {
+    area: c.area ?? '', descripcion: c.descripcion ?? '', cupos: c.cupos, ciclo_lectivo: c.ciclo_lectivo,
+    fecha_inicio: c.fecha_inicio ?? '', fecha_fin: c.fecha_fin ?? '', numero_plan: c.numero_plan ?? '',
+    fecha_carga: c.fecha_carga ?? '', tipo_plan: c.tipo_plan ?? 'PPE', visto: c.visto ?? false,
+  }
   erroresPropuesta.value = {}
 }
 
@@ -149,6 +153,10 @@ onMounted(cargar)
         <div><dt>Empresa</dt><dd>{{ convenio.empresa?.nombre_fantasia || convenio.empresa?.razon_social }} <DatosPruebaBadge v-if="convenio.empresa?.datos_prueba" /></dd></div>
         <div><dt>Escuela</dt><dd>{{ convenio.escuela?.nombre }} <DatosPruebaBadge v-if="convenio.escuela?.datos_prueba" /></dd></div>
         <div><dt>Ciclo lectivo</dt><dd>{{ convenio.ciclo_lectivo }}</dd></div>
+        <div><dt>Número de plan</dt><dd>{{ convenio.numero_plan || 'Sin asignar' }}</dd></div>
+        <div><dt>Tipo de plan</dt><dd>{{ convenio.tipo_plan || 'PPE' }}</dd></div>
+        <div><dt>Fecha de carga</dt><dd>{{ formatearFecha(convenio.fecha_carga) }}</dd></div>
+        <div><dt>Visado</dt><dd>{{ convenio.visto ? 'Sí' : 'No' }}</dd></div>
         <div><dt>Cupos</dt><dd>{{ ocupados }} ocupados de {{ convenio.cupos }}</dd></div>
         <div><dt>Período</dt><dd>{{ formatearFecha(convenio.fecha_inicio) }} al {{ formatearFecha(convenio.fecha_fin) }}</dd></div>
         <div><dt>Postulado</dt><dd>{{ formatearFecha(convenio.creado_en) }}</dd></div>

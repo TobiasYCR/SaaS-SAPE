@@ -2,16 +2,18 @@
 import { actualizarAlumno, crearAlumno, darDeBajaAlumno, eliminarAlumno, reactivarAlumno } from '../../services/alumnosService'
 import { limpiarVacios } from '../../utils/validaciones'
 
-const CAMPOS = ['nombre', 'apellido', 'dni', 'fecha_nacimiento', 'curso', 'division', 'especialidad', 'email', 'telefono', 'responsable_nombre', 'responsable_telefono']
+const CAMPOS = ['nombre', 'apellido', 'tipo_documento', 'dni', 'fecha_nacimiento', 'curso', 'division', 'especialidad', 'email', 'telefono', 'responsable_nombre', 'responsable_telefono']
 
 export const formularioVacio = () => Object.fromEntries(CAMPOS.map((c) => [c, '']))
 export const aFormulario = (alumno) => Object.fromEntries(CAMPOS.map((c) => [c, alumno?.[c] ?? '']))
 export const nombreCompleto = (a) => `${a.apellido}, ${a.nombre}`
-export const cantidadInscripciones = (a) => a.inscripciones?.[0]?.count ?? 0
+export const cantidadInscripciones = (a) => a.inscripciones?.[0]?.count ?? a.inscripciones?.length ?? 0
+export const cantidadPlanes = (a) => new Set((a.inscripciones || []).map((i) => i.convenio_id).filter(Boolean)).size
 
 function aRegistro(formulario) {
   const datos = limpiarVacios(formulario)
   datos.curso = datos.curso ? Number(datos.curso) : null
+  datos.tipo_documento = datos.tipo_documento || 'DNI'
   return datos
 }
 

@@ -20,6 +20,18 @@ defineProps({ errores: { type: Object, default: () => ({}) } })
     <CampoFormulario etiqueta="Rubro" :error="errores.rubro">
       <input v-model="datos.rubro" maxlength="80" placeholder="Software, Contabilidad..." />
     </CampoFormulario>
+    <CampoFormulario etiqueta="Referente de prácticas" :error="errores.referente_nombre">
+      <input v-model="datos.referente_nombre" maxlength="150" />
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Cargo del referente" :error="errores.referente_cargo">
+      <input v-model="datos.referente_cargo" maxlength="100" />
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Email del referente" :error="errores.referente_email">
+      <input v-model="datos.referente_email" type="email" maxlength="150" />
+    </CampoFormulario>
+    <CampoFormulario etiqueta="Teléfono del referente" :error="errores.referente_telefono">
+      <input v-model="datos.referente_telefono" type="tel" maxlength="40" />
+    </CampoFormulario>
     <CampoFormulario etiqueta="Dirección" :error="errores.direccion">
       <input v-model="datos.direccion" maxlength="150" autocomplete="street-address" />
     </CampoFormulario>
