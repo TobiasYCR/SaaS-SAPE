@@ -1,4 +1,5 @@
 // Lógica compartida del módulo Alumnos (listado y detalle)
+import { confirmar } from '../../composables/useConfirmacion'
 import { actualizarAlumno, crearAlumno, darDeBajaAlumno, eliminarAlumno, reactivarAlumno } from '../../services/alumnosService'
 import { limpiarVacios } from '../../utils/validaciones'
 
@@ -31,10 +32,20 @@ export function guardarAlumno(op, { id = null, escuelaId, formulario }) {
 export async function quitarAlumno(op, alumno, inscripciones) {
   const nombre = nombreCompleto(alumno)
   if (inscripciones > 0) {
-    if (!window.confirm(`${nombre} tiene ${inscripciones} inscripción(es). Se va a dar de baja: queda en el historial y se puede reactivar. ¿Continuar?`)) return null
+    if (!(await confirmar({
+      titulo: 'Dar de baja alumno',
+      mensaje: `${nombre} tiene ${inscripciones} inscripción(es). Se va a dar de baja: queda en el historial y se puede reactivar. ¿Continuar?`,
+      textoConfirmar: 'Dar de baja',
+      peligro: true,
+    }))) return null
     return (await op.ejecutar(() => darDeBajaAlumno(alumno.id), `${nombre} quedó dado de baja.`)) ? 'baja' : null
   }
-  if (!window.confirm(`¿Eliminar definitivamente a ${nombre}? Esta acción no se puede deshacer.`)) return null
+  if (!(await confirmar({
+    titulo: 'Eliminar alumno',
+    mensaje: `¿Eliminar definitivamente a ${nombre}? Esta acción no se puede deshacer.`,
+    textoConfirmar: 'Eliminar',
+    peligro: true,
+  }))) return null
   return (await op.ejecutar(() => eliminarAlumno(alumno.id).then(() => true), `${nombre} se eliminó.`)) ? 'eliminado' : null
 }
 

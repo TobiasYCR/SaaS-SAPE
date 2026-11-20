@@ -6,6 +6,7 @@ import FormEscuela from '../components/organizacion/FormEscuela.vue'
 import FormEmpresa from '../components/organizacion/FormEmpresa.vue'
 import { aFormulario, aRegistro } from '../components/organizacion/datosOrganizacion'
 import { currentUser, esAdmin, ETIQUETA_ROL, organizacion, recargarPerfil } from '../composables/useAuth'
+import { confirmar } from '../composables/useConfirmacion'
 import { useOperacion } from '../composables/useOperacion'
 import { actualizarEscuela, obtenerEscuela } from '../services/escuelasService'
 import { actualizarEmpresa, obtenerEmpresa } from '../services/empresasService'
@@ -67,7 +68,12 @@ async function sumarMiembro() {
 
 async function guardarMiembro(miembro, activo = edicionesMiembro.value[miembro.id].activo) {
   const edicion = edicionesMiembro.value[miembro.id]
-  if (!activo && miembro.activo && !window.confirm(`¿Desactivar el acceso de ${miembro.nombre_completo || miembro.email}?`)) return
+  if (!activo && miembro.activo && !(await confirmar({
+    titulo: 'Desactivar acceso',
+    mensaje: `¿Desactivar el acceso de ${miembro.nombre_completo || miembro.email}?`,
+    textoConfirmar: 'Desactivar',
+    peligro: true,
+  }))) return
 
   const ok = await gestionMiembro.ejecutar(
     () => actualizarMiembro(miembro.id, edicion.rol, activo).then(() => true),
