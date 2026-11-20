@@ -5,6 +5,7 @@ import AvisoOperacion from '../components/common/AvisoOperacion.vue'
 import CampoFormulario from '../components/common/CampoFormulario.vue'
 import EstadoBadge from '../components/common/EstadoBadge.vue'
 import { currentUser, esAdmin, rol } from '../composables/useAuth'
+import { confirmar } from '../composables/useConfirmacion'
 import { useOperacion } from '../composables/useOperacion'
 import { listarRequisitos } from '../services/conveniosService'
 import {
@@ -108,20 +109,43 @@ const MENSAJES = {
   cancelada: 'La inscripción se canceló. Queda en el historial.',
 }
 const CONFIRMAR = {
-  enviada: '¿Enviar la inscripción a la empresa? Después ya no se pueden modificar los datos.',
-  rechazada: '¿Rechazar la inscripción?',
-  finalizada: '¿Marcar la pasantía como finalizada?',
-  cancelada: '¿Cancelar la inscripción? Queda registrada en el historial.',
+  enviada: {
+    titulo: 'Enviar inscripción',
+    mensaje: '¿Enviar la inscripción a la empresa? Después ya no se pueden modificar los datos.',
+    textoConfirmar: 'Enviar a la empresa',
+  },
+  rechazada: {
+    titulo: 'Rechazar inscripción',
+    mensaje: '¿Rechazar la inscripción?',
+    textoConfirmar: 'Rechazar',
+    peligro: true,
+  },
+  finalizada: {
+    titulo: 'Finalizar pasantía',
+    mensaje: '¿Marcar la pasantía como finalizada?',
+    textoConfirmar: 'Finalizar',
+  },
+  cancelada: {
+    titulo: 'Cancelar inscripción',
+    mensaje: '¿Cancelar la inscripción? Queda registrada en el historial.',
+    textoConfirmar: 'Cancelar inscripción',
+    peligro: true,
+  },
 }
 
 async function cambiarEstado(nuevo) {
-  if (CONFIRMAR[nuevo] && !window.confirm(CONFIRMAR[nuevo])) return
+  if (CONFIRMAR[nuevo] && !(await confirmar(CONFIRMAR[nuevo]))) return
   const ok = await accion.ejecutar(() => cambiarEstadoInscripcion(id, nuevo), MENSAJES[nuevo])
   if (ok) await cargar()
 }
 
 async function eliminarBorrador() {
-  if (!window.confirm('¿Eliminar este borrador? Se borran también los datos cargados.')) return
+  if (!(await confirmar({
+    titulo: 'Eliminar borrador',
+    mensaje: '¿Eliminar este borrador? Se borran también los datos cargados.',
+    textoConfirmar: 'Eliminar borrador',
+    peligro: true,
+  }))) return
   const ok = await accion.ejecutar(() => eliminarInscripcion(id).then(() => true))
   if (ok) router.replace(`/convenios/${inscripcion.value.convenio_id}`)
 }
@@ -162,7 +186,12 @@ async function guardarSeguimiento() {
 }
 
 async function quitarSeguimiento(s) {
-  if (!window.confirm(`¿Eliminar el seguimiento del ${formatearFecha(s.fecha)}?`)) return
+  if (!(await confirmar({
+    titulo: 'Eliminar seguimiento',
+    mensaje: `¿Eliminar el seguimiento del ${formatearFecha(s.fecha)}?`,
+    textoConfirmar: 'Eliminar',
+    peligro: true,
+  }))) return
   const ok = await segOp.ejecutar(() => eliminarSeguimiento(s.id).then(() => true), 'Seguimiento eliminado.')
   if (ok) seguimientos.value = await listarSeguimientos(id)
 }

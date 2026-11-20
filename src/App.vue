@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import AppSidebar from './components/layout/AppSidebar.vue'
 import AppTopbar from './components/layout/AppTopbar.vue'
+import ModalConfirmacion from './components/common/ModalConfirmacion.vue'
 import { cargandoPerfil, cuentaDesactivada, currentUser, errorPerfil, recargarPerfil } from './composables/useAuth'
 
 const route = useRoute()
@@ -39,4 +40,5 @@ const pageTitle = computed(() => route.meta.titulo || 'SAPE')
       </div>
     </main>
   </div>
+  <ModalConfirmacion />
 </template>

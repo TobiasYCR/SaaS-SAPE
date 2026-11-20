@@ -7,6 +7,7 @@ import DatosPruebaBadge from '../components/common/DatosPruebaBadge.vue'
 import EstadoBadge from '../components/common/EstadoBadge.vue'
 import FormPropuesta from '../components/convenios/FormPropuesta.vue'
 import { esAdmin, rol } from '../composables/useAuth'
+import { confirmar } from '../composables/useConfirmacion'
 import { useOperacion } from '../composables/useOperacion'
 import { listarAlumnos } from '../services/alumnosService'
 import {
@@ -59,21 +60,48 @@ const MENSAJES = {
   cancelado: 'El convenio se canceló. Queda en el historial.',
 }
 const CONFIRMAR = {
-  rechazado: '¿Rechazar la postulación de la empresa?',
-  activo: 'Al activar el convenio se cierran los requisitos y ya no se pueden modificar. ¿Continuar?',
-  finalizado: '¿Finalizar el convenio?',
-  cancelado: '¿Cancelar el convenio? Queda registrado en el historial.',
+  rechazado: {
+    titulo: 'Rechazar postulación',
+    mensaje: '¿Rechazar la postulación de la empresa?',
+    textoConfirmar: 'Rechazar',
+    peligro: true,
+  },
+  activo: {
+    titulo: 'Activar convenio',
+    mensaje: 'Al activar el convenio se cierran los requisitos y ya no se pueden modificar. ¿Continuar?',
+    textoConfirmar: 'Activar convenio',
+  },
+  finalizado: {
+    titulo: 'Finalizar convenio',
+    mensaje: '¿Finalizar el convenio?',
+    textoConfirmar: 'Finalizar',
+  },
+  cancelado: {
+    titulo: 'Cancelar convenio',
+    mensaje: '¿Cancelar el convenio? Queda registrado en el historial.',
+    textoConfirmar: 'Cancelar convenio',
+    peligro: true,
+  },
 }
 
 async function cambiarEstado(nuevo) {
-  if (CONFIRMAR[nuevo] && !window.confirm(CONFIRMAR[nuevo])) return
-  if (nuevo === 'activo' && !requisitos.value.length && !window.confirm('El convenio no tiene requisitos. Los alumnos se van a poder inscribir sin cargar datos. ¿Activar igual?')) return
+  if (CONFIRMAR[nuevo] && !(await confirmar(CONFIRMAR[nuevo]))) return
+  if (nuevo === 'activo' && !requisitos.value.length && !(await confirmar({
+    titulo: 'Convenio sin requisitos',
+    mensaje: 'El convenio no tiene requisitos. Los alumnos se van a poder inscribir sin cargar datos. ¿Activar igual?',
+    textoConfirmar: 'Activar igual',
+  }))) return
   const ok = await accion.ejecutar(() => cambiarEstadoConvenio(id, nuevo), MENSAJES[nuevo])
   if (ok) await cargar()
 }
 
 async function retirar() {
-  if (!window.confirm('¿Retirar la postulación? Se elimina porque la escuela todavía no respondió.')) return
+  if (!(await confirmar({
+    titulo: 'Retirar postulación',
+    mensaje: '¿Retirar la postulación? Se elimina porque la escuela todavía no respondió.',
+    textoConfirmar: 'Retirar',
+    peligro: true,
+  }))) return
   const ok = await accion.ejecutar(() => retirarPostulacion(id).then(() => true))
   if (ok) router.replace('/convenios')
 }
@@ -124,7 +152,12 @@ async function guardarRequisito() {
 }
 
 async function quitarRequisito(r) {
-  if (!window.confirm(`¿Eliminar el requisito "${r.nombre}"?`)) return
+  if (!(await confirmar({
+    titulo: 'Eliminar requisito',
+    mensaje: `¿Eliminar el requisito "${r.nombre}"?`,
+    textoConfirmar: 'Eliminar',
+    peligro: true,
+  }))) return
   const ok = await formReq.ejecutar(() => eliminarRequisito(r.id).then(() => true), 'Requisito eliminado.')
   if (ok) requisitos.value = await listarRequisitos(id)
 }
