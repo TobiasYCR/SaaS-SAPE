@@ -6,6 +6,8 @@ import { supabase } from '../../services/supabase'
 import DatosPruebaBadge from '../common/DatosPruebaBadge.vue'
 
 const router = useRouter()
+defineProps({ open: Boolean })
+const emit = defineEmits(['navigate'])
 const signOutError = ref('')
 
 // tipo: limita el ítem a un tipo de organización
@@ -53,7 +55,7 @@ async function signOut() {
 </script>
 
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" :class="{ 'sidebar--open': open }">
     <div class="brand">
       <img class="brand-logo" src="/logo-sape.png" alt="SAPE Pasantías" />
       <div>
@@ -73,7 +75,7 @@ async function signOut() {
 
     <p class="nav-label">{{ organizacion?.tipo === 'empresa' ? 'EMPRESA' : 'VIDA ESCOLAR' }}</p>
     <nav class="main-nav" aria-label="Navegación principal">
-      <RouterLink v-for="item in navigation" :key="item.to" :to="item.to">
+      <RouterLink v-for="item in navigation" :key="item.to" :to="item.to" @click="emit('navigate')">
         <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>{{ item.label }}
       </RouterLink>
     </nav>
@@ -82,7 +84,7 @@ async function signOut() {
       <div class="user-row"><div class="avatar">{{ initials(userName) }}</div><div class="user-details"><strong>{{ userName }}</strong><span>{{ currentUser?.email }}</span></div></div>
       <p v-if="signOutError" class="sidebar-error" role="alert">{{ signOutError }}</p>
       <div class="account-actions">
-        <RouterLink to="/change-password">Cambiar contraseña</RouterLink>
+        <RouterLink to="/change-password" @click="emit('navigate')">Cambiar contraseña</RouterLink>
         <button type="button" @click="signOut">Cerrar sesión</button>
       </div>
     </div>
